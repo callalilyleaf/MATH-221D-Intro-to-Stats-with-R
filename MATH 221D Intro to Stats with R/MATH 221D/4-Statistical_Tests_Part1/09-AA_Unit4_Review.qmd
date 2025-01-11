@@ -1,0 +1,535 @@
+---
+title: Comparing Means
+subtitle: Unit 2 Review
+format:
+  html:
+    self_contained: true
+    embed_resources: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+
+# Introduction
+
+In this activity, you will use everything we've covered up to this point including:
+
+* Data manipulation using tidyverse functions
+* Hypothesis tests
+  + 1-Sample t-test
+  + 2-sample dependent t-test
+  + 2-sample independent t-test
+  + ANOVA
+* Confidence Intervals where applicable
+  
+We will be using data collected about students in 2 Portuguese schools including their final grade. The goal is to answer research questions using statistical methods to see what factors significantly impact final grades.  
+
+
+## Getting to know a new dataset
+
+In class, we have reinforced a process for approaching a new dataset. The following is a summary of activities that help us conduct good research:
+
+  + __Read in the data__  
+  + __Explore the dataset as a whole__:
+    * What are the column names? What do they mean? Where can I find information about them?
+    * What is the response/dependent variable? Could there be more than one?
+    * What are some factors that may impact the response variable?  Which are likely the most important?
+  + __Explore specific columns__
+    * Start with the response variable.  Are there any outliers?  Obtain summary statistics (`favstats()`), visualize the data (`histogram()`, `boxplot()`).
+    * Explore the explanatory variables you think are most impact to the response variable.  What type of data are they (categorical, quantitative)?  For categorical variables, what are all the levels (`unique()`)
+  + __Formalize statistical hypotheses__.  If your factors are categorical, how many groups will you be comparing?  Is it a 1-sample t-test, 2-sample t-test, ANOVA?
+  + __Prepare data for analysis__.  You may need to clean the data (eg. `data %>% filter() %>% select()`)
+  + __Perform the appropriate analysis__ (`t.test()`, `aov()`)
+
+All these activities are important, but we may spend more or less time on any one of them depending on the state of the data.    
+
+
+## Load the Libraries and Data
+
+```{r, echo=FALSE, include=FALSE}
+
+## Don't worry about this line of code. It is included for purposes of rendering the document
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+
+library(rio)
+library(tidyverse)
+library(mosaic)
+library(car)
+
+student <- read_csv('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/student_data_kaggle.csv')
+
+glimpse(student)
+
+```
+
+
+# Review the data
+
+Take some time to familiarize yourself with the data.  Check the [website](https://www.kaggle.com/datasets/whenamancodes/student-performance) to see what the columns are.
+
+What is the response variable?
+A: The final grade, G3
+
+Create a histogram of the response variable.
+
+```{r}
+histogram(student$G3)
+boxplot(student$G3 ~ student$Medu, main = "Student Final Academic Grade with different Mother Education Level", xlab = "Student Mother Education Level", col=c(2,3,4,5,6))
+```
+
+What do you notice about the shape of the distribution?  
+:It's close to symmetric, but there's a gap around x = 3.
+
+What anomalies, if any, do you notice?  
+:The density at x = 0 is way higher than its surrounding area.
+
+Calculate summary statistics for the response variable.
+
+```{r}
+favstats(student$G3) %>% knitr::kable()
+
+```
+
+__Question__:  What is the minimum?  
+__Answer__:  0
+
+__Question__:  What is the maximum?  
+__Answer__:  20
+
+__Question__:  How many students participated in the survey?  
+__Answer__:  395
+
+__Question__:  Rank order the top 5 explanatory variables you think most influence the response and identify each as a categorical or quantitative variable:
+
+  1. Fedu (Father's education. Categorical)
+  2. Medu (Mother's education. Categorical)
+  3. studytime (weekly study time, Categorical)
+  4. reason (reason to choose this school, Categorical)
+  5. failures (number of past class failures, Categorical)
+
+__NOTE__: Some of the above variables may be quantitative, which is great! Next unit will cover how to analyze those relationships.  This assignment, however, focuses on comparing differences between groups and only considers categorical explanatory variables variables.  
+
+
+# Preparing data for analysis
+
+## Categories Labeled as Numbers
+
+Sometimes even correct data can have issues that must be addressed.  For example, categories are often labeled as numbers.  Software can't guess when numbers are supposed to be categories, so we have to tell R when a number should be treated as a category.
+
+To force a variable to be a category, we use the `factor()` function in R.  We can change the variable type in the data itself or change it in the analysis.  We demonstrate both methods below.
+
+### Changing a Column Type in a dataset
+
+Father's education, `Fedu`, shows up as a number in R.  The website suggests that the numbers represent categories (0 = none, 1 = primary education (4th grade), 2 = 5th to 9th grade, 3 = secondary education or 4 = higher education).  
+
+To change the data type in the data itself, we can use a 'mutate' statement in the following manner:
+
+```{r, eval=FALSE}
+
+# Create a new dataset called fedu_data that begins with the clean data and adds a column that we called Fedu_factor, which is the factorized column, Fedu:
+
+# mutate: create new column
+new_data <- student %>%
+  mutate(Fedu_factor = factor(Fedu))
+
+# Check the column names of the new dataset.  Notice the new column
+# names('dataset') shows all of the column names
+names(new_data)
+
+  
+# glimpse() shows us data types.  Notice after Fedu_factor, the <fct>, which shows us that this is in fact, a factor variable type.  <dbl> stands for "double" and is a numeric variable type
+glimpse(new_data)
+
+```
+
+### Changing the Variable Type "on the fly"
+
+You may not want to bother changing all the variable types for each potential analysis.  Fortunately, you can create a factor "on the fly" within the analysis function itself.  
+
+Because there are more than 2 levels of Father's Education, I will demonstrate how this is done in an ANOVA:
+
+```{r}
+
+# Force Fedu to be treated like a category in ANOVA:
+fedu_anova <- aov(student$G3 ~ factor(student$Fedu)) #method 1: using factor() to convert the original column
+summary(fedu_anova)
+
+fedu_anova2 <- aov(new_data$G3 ~ new_data$Fedu_factor) #method 2: using the new data set and the new factor column
+summary(fedu_anova2)
+```
+
+This works with most analysis functions including `t.test()` and `aov()`.
+
+__NOTE__:  You only have to do this for variables in a dataset that are 'categories labeled as numbers.'  If the categories are text, `t.test()` and `aov()` automatically recognizes the variable as categorical. However, it does no harm to put a column with text into a `factor()` statement.  
+
+
+## Cleaning the Data
+
+While exploring the data, you may have noticed a few students ended up with a final grade of zero.  While it may be interesting to explore what factors lead to an incomplete grade, we want to make conclusions about students who completed the course.  
+
+Create a clean dataset called, `clean`, that excludes zeros for G3.  This will be used for the following analyses.  
+
+```{r}
+clean <- student %>%
+  filter(student$G3 > 0)
+
+histogram(clean$G3)
+names(clean)
+
+```
+
+
+# Perform the Appropriate Analysis
+
+## Comparing Schools
+
+Suppose the Gabriel Pereira school (GP) has more stringent admissions requirements.  We suspect this would lead to higher grades, on average.  
+
+Create a side-by-side boxplot of the final grades for each school.  Change the y-axis label to read "Final Grade out of 20", the x-axis label to read "School", and add a title.
+
+```{r}
+boxplot(clean$G3 ~ clean$school, xlab = "School", ylab="Final Grade out of 20", main = "Student Final Grades from Different School", col = c(2,3))
+
+```
+
+__Question__:  What do you notice?  
+__Answer__: GP, Gabriel Pereira school, has the higher student final grades than MS, Mousinho da Silveira school.
+
+Create a table of summary statistics of final grade for each school:
+
+```{r}
+favstats(clean$G3 ~ clean$school) %>% knitr::kable()
+
+```
+
+
+### Hypothesis Test
+
+Create a qqPlot to look at the normality of both groups:
+
+```{r}
+qqPlot(clean$G3 ~ clean$school)
+
+```
+
+__Question__:  Do the grades look normally distributed for both groups?  If not, should we be concerned?  
+__Answer__:  Yes, they look normally distributed. Even if they are not, since the amount of data are both bigger than 30, which are normal distributed as well(according to CLT).
+
+__Question__:  Can we trust the P-value?  
+__Answer__:  Yes since both groups are normally distributed.
+
+State your null and alternative hypotheses and significance level.
+
+__NOTE__: Recall that R uses alphabetical order to determine which group is the reference group. It is useful to put this group on the left side of the null hypothesis and set your alternative hypothesis accordingly.  
+
+$$H_o: u_{GP} = u_{MS}$$ 
+
+$$H_a: u_{GP} > u_{MS}$$  
+
+$$\alpha = 0.05$$  
+Perform the appropriate statistical test:  
+
+```{r}
+t.test(clean$G3 ~ clean$school, alternative = "greater")
+
+```
+
+__Question__:  What is the P-value?  
+__Answer__:  p-value = 0.05197
+
+__Question__:  What is your conclusion in context of the research question?  
+__Answer__:  I have insufficient evidence to suggest Gabriel Pereira School has the higher average student final grade with Mousinho da Silveira School.
+
+### Confidence Interval
+  
+Create a $(1-\alpha)$% confidence interval and explain it in context of the research question.
+
+```{r}
+t.test(clean$G3 ~ clean$school, conf.level = 1-0.05)$conf.int
+
+```
+
+__Explanation__:  I'm 95% confident that the difference student final grade between Gabriel Pereira School and Mousinho da Silveira School, on average, is located between -0.1775092 and 1.8505250.
+
+## Comparing Second Period Grade with Final Grade
+
+We suspect there is a difference between the second period and the final grade, though we do not know if they go up or down.  Carry out a hypothesis test to evaluate this suspicion.
+
+### Hypothesis Test
+
+Choose how you will define the difference between final grade and second period grade, and create a new object called `diff`:
+
+```{r}
+diff <- clean$G3 - clean$G2 # If diff > 0, it means G3 > G2, the grade goes up. Vice Versa
+```
+
+__Question__:  What does a negative number mean?  
+__Answer__:  G3 < G2, the grade goes down.
+
+Create a `qqPlot()` of `diff` and check for normality:
+
+```{r}
+qqPlot(diff)
+favstats(diff)
+
+```
+
+__Question__:  Do the grade differences look normally distributed?  If not, should we be concerned?  
+__Answer__:  No, it looks skewed. However, since the amount of data is bigger than 30 (357 > 30), we don't need to be concerned about it.
+
+__Question__:  Can we trust the P-value?  
+__Answer__:  Yes you can, since the amount of data > 30, it's normally distributed.
+
+State your null and alternative hypothesis and choose a significance level:
+
+$$H_o: u_{diff} = 0$$  
+
+$$Ha: u_{diff} > 0$$    
+
+$$\alpha = 0.05$$  
+
+Perform the appropriate analysis.
+
+```{r}
+t.test(diff, alternative = "greater")
+t.test(diff, alternative = "two.sided")
+# Q: Can I set the Ha as udiff > 0? But I feel a little bit weird about it.
+
+```
+
+
+__Question__:  What is the P-value?  
+__Answer__:  p-value = 0.000117
+
+__Question__:  What conclusion do you make in context of this research question?  
+__Answer__:  I have sufficient evidence to suggest that the average final grade is higher than the second period grade.
+
+### Confidence Interval
+  
+Create a $(1-\alpha)$% confidence interval for the differences and explain it in context of the research question.
+
+```{r}
+t.test(diff, conf.level = 1-0.05)$conf.int
+
+```
+
+__Explanation__:  I'm 95% confident that the difference between student final grade and second period grade, on average, is located between 0.07782404 and 0.25270817.
+
+
+## Absenteeism in Portugal
+
+In 2021, Portugal [reported](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Secondary_education_statistics#Out-of-school_rates) having 0% absenteeism for 15-year-olds.  We suspect that the actual absenteeism is higher than the reported value (zero).
+
+### Hypothesis Test
+
+Create a `qqPlot()` for absences.
+
+```{r}
+fifteen_absences <- clean %>%
+  filter(clean$age == 15)
+
+qqPlot(fifteen_absences$absences)
+favstats(fifteen_absences$absences)
+```
+
+
+__Question__:  Do absences look normally distributed?  If not, should we be concerned?  
+__Answer__:  It looks alright, just with some skewed dots in the bottom part. Since the amount of data is big enough (357 > 30), we know it's normally distributed.
+
+__Question__:  Can we trust the P-value?  
+__Answer__: Yes since the data is normally distributed. 
+
+State your null and alternative hypotheses and choose a significance level:
+
+$$H_o: u_a = 0$$  
+
+$$H_a: u_a > 0$$  
+
+$$\alpha = 0.05$$  
+
+Perform the appropriate analysis.
+
+```{r}
+t.test(fifteen_absences$absences, alternative = "greater")
+# Q: Is there any difference between uGP > uMS and uGP - uMS > 0?
+# How does the reference group and test group difference work?
+```
+
+__Question__:  What is the P-value?  
+__Answer__:  p-value = 2.991e-11
+
+__Question__:  What conclusion do you make in context of this research question?  
+__Answer__:  I have sufficient evidence to suggest that the 15 year-old school absence times, on average, is bigger than 0.
+
+
+### Confidence Interval
+
+Create a $(1-\alpha)$% confidence interval for average absences and interpret it in context of the problem.
+
+```{r}
+t.test(fifteen_absences$absences, conf.level = 1-0.05)$conf.int
+
+```
+
+__Explanation__:  I'm 95% confident that the average number of school absence of 15 year-old students is located between 2.664144 and 4.546382.
+
+
+
+## The Impact of Mother's Education Level
+
+The level of education of the mother in the home is thought to have a significant impact on student success.  
+
+Create a side-by-side boxplot of final grades for each level of mother's education.
+
+```{r}
+boxplot(clean$G3 ~ factor(clean$Medu), main = "Student Final Academic Grade with different Mother Education Levels", xlab = "Student Mother Education Levels", col = c(2,3,4,5,6))
+
+ggplot(data = clean, mapping = aes(x = factor(clean$Medu), y = clean$G3)) + 
+         geom_boxplot()
+# Q: How can I set the color?
+```
+
+Create a table of summary statistics of final grades for each level of mother's education.
+
+```{r}
+favstats(clean$G3 ~ clean$Medu) %>% knitr::kable()
+
+```
+
+__Question__:  How many respondents have a mother with no formal education (level 0)?  
+__Answer__:  3
+
+Create a new dataset, `clean_medu`, that does not include mother's education level 0.
+
+```{r}
+
+clean_medu <- clean %>% 
+  filter(clean$Medu != 0) %>%
+  mutate(medu_factor = factor(Medu))
+
+favstats(clean_medu$G3 ~ clean_medu$medu_factor)%>% knitr::kable()
+```
+
+Create another boxplot with the new dataset that excludes level 0.
+
+```{r}
+boxplot(clean_medu$G3 ~ clean_medu$Medu, main = "Student Final Academic Grade with different Mother Education Levels", xlab = "Student Mother Education Levels", col=c(2,3,4,5))
+
+```
+
+Create a summary table of final grades for each level of a mother's education with the new dataset.
+
+```{r}
+favstats(clean_medu$G3 ~ clean_medu$medu_factor) %>% knitr::kable()
+
+sds = favstats(clean_medu$G3 ~ clean_medu$medu_factor)$sd
+
+max(sds)/min(sds)
+```
+
+__Question__:  What is the maximum standard deviation?  
+__Answer__:  3.475202
+
+__Question__:  What is the minimum standard deviation?  
+__Answer__:  2.495383
+
+__Question__:  Verify that the maximum is less than twice as large as the minimum to check the "equality of standard deviations".  
+__Answer__:  Yes, the ratio of maximum and minimum of standard deviations is 1.392653.
+
+
+### Hypothesis Test
+
+State your null and alternative hypotheses and pick alpha:
+
+$$H_o: u_1 = u_2 = u_3 = u_4$$  
+
+$$H_a: At\ least\ one\ of\ them\ not\ equals\ to\ one\ another.$$  
+
+$$\alpha = 0.05$$  
+
+Perform the appropriate statistical test.
+
+```{r}
+aov_medu <- aov(clean_medu$G3 ~ clean_medu$medu_factor)
+
+summary(aov_medu)
+```
+
+__Question__:  What is the test statistic?  
+__Answer__:  F-value = 5.748
+
+__Question__:  What is the P-value?  
+__Answer__:  P-value = 0.000756
+
+Check the normality of the residuals.
+
+```{r}
+qqPlot(aov_medu$residuals)
+
+```
+
+__Question__:  Do the residuals appear roughly normally distributed?  
+__Answer__:  Yes. It looks normally distributed according to qqPlot graph.
+
+__Question__:  Can we trust the P-value.  
+__Answer__:  Yes since the data is normally distributed.
+
+State your conclusion:
+I have sufficient evidence to suggest that the student final grades among different mother education levels, on average, are not equal to each other.
+
+
+## Choose your own adventure
+
+Pick another variable that was not analyzed above: 
+failures (number of past class failures, Categorical)
+
+Create a side-by-side boxplot.  Be sure to properly label the graph and add sufficient information so readers can know what they are looking at without having to search through the report or code.  
+
+```{r}
+favstats(clean$G3 ~ clean$failures)
+boxplot(clean$G3 ~ clean$failures, xlab = "Number of Past Class Failures (n if 1<=n<=3, else 4)", ylab = "Final Grade out of 20", main = "Student Final Grades with Number of Past Class Failures", col = c(2,3,4,5))
+
+```
+
+Perform the appropriate analysis.  Be sure to include a concise conclusion in the context of the research question, including a hypothesis test (and confidence interval if applicable.)
+
+Hypothesis Statement:
+$$H_o = u_0 = u_1 = u_2 = u_3 $$
+$$H_a = At\ least\ one\ of\ the\ mean\ not\ equals\ to\ one\ another.$$
+$$\alpha = 0.05$$
+
+```{r}
+aov_failure <- aov(clean$G3 ~ clean$failures)
+
+summary(aov_failure)
+
+```
+__Question__:  What is the test statistic?  
+__Answer__:  F-value = 33.55
+
+__Question__:  What is the P-value?  
+__Answer__:  P-value = 1.53e-08
+
+Check the normality of the residuals.
+
+```{r}
+sds_failure <- favstats(clean$G3 ~ clean$failures)$sd
+max(sds_failure) / min(sds_failure)
+
+qqPlot(aov_failure$residuals)
+
+```
+
+__Question__:  Do the residuals appear roughly normally distributed?  
+__Answer__:  Yes. It looks normally distributed according to qqPlot graph.
+
+__Question__:  Can we trust the P-value.  
+__Answer__:  Yes since the data is normally distributed according to the equal standard deviation test result (1.902275 < 2, test passed) and qqPlot graph.
+
+State your conclusion:
+I have sufficient evidence to suggest that the student final grades among different past class failures, on average, are not equal to each other.
+

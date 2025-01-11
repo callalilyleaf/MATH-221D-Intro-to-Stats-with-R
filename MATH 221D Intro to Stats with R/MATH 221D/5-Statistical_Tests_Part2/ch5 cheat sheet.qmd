@@ -1,0 +1,101 @@
+---
+title: Ch5 cheat sheet
+subtitle: Notes for the Ch5 on class
+format:
+  html:
+    self_contained: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+library(ggplot2)
+```
+----------------------------- Which test should we use ? --------------------------
+t.test(): explanatory variable(x) -> categorical(1 level)  ; response variable(y) -> quantitative -- 
+aov(): explanatory variable(x) -> categorical(levels >= 2)  ; response variable(y) -> quantitative --
+lm():  explanatory variable(x) -> quantitative ; response variable(y) -> quantitative -- Linear Model
+
+Syntax: (It's the same)
+`t.test(y ~ x, data = dat)`
+`aov(y ~ x, data = dat)`
+`lm(y ~ x, data = dat)`
+
+# Don't forget that after we do the aov() test, we still need to use summary()
+  to get the valuable info! You can also get residuals from the summary()
+  
+--------------------------- Regression analysis validation ----------------------------
+Regression analysis has 5 requirements to be valid.  While this sounds daunting, in practice we can check most of them very quickly. 4th and 5th validation are normally fine with the random sampling.
+
+
+1. The linear relationship is assessed visually with the scatter plot.  If there is obvious curvature or non-linearity then fitting a line isn't the best model.
+->ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Student Confidence Rating in Math and Test Score"
+  ) +
+  geom_smooth(method="lm")
+
+2. We check the normality of the residuals with a `qqPlot()` exactly as with the `aov()` output.
+-> qqPlot(math_lm$residuals)
+
+3. Recall that with ANOVA, we had to check that the variation in each group was roughly the same (largest standard deviation was less than twice as large as the smallest standard deviation).  For a quantitative explanatory variable, we can't calculate the standard deviation for a specified level of $x$ because $x$ can be any number.  
+
+Constant variance in regression is checked with a new plot that looks at how the predicted values relate to the residuals.  This is important because we want our predictions to be "wrong" about the same regardless of the value of the prediction.  We're looking for random scatter.
+-> plot(math_lm, which = 1)
+----------------------------------Correlation Coefficient Function------------------------------------------
+cor(dataset$y ~ dataset$x)
+
+
+Recall that when we had a quantitative response variable and a categorical explanatory variable we could use the `t.test()` if the categorical variable had 2 levels or the `aov()` function if the categorical variable had multiple levels.
+
+----------------------------------------------------------------------------------
+
+Q: What is a "good correlation"?
+A: It depends on the real relation between the 2 variables. For example, a research indicates that the ice cream sales number has a high positive correlation with the shark accidents numbers. Is the ice cream sales number has a direct impact on the shark accident? Remember, Correlation does not equal causation.
+
+Ex.
+# Ask brother Cannon for the outlier graph resource
+
+- The Equation of r, the correlation coefficient
+1. Meaning: 
+```{r}
+img <- image_read("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEp2A_l2XGVWDGnfBpe_4bZ2OmKFTH6zJo0g&s")
+ggplot() + 
+  background_image(img)
+
+```
+
+----------------------------------------------------------------------------------
+
+Q: If the correlation coefficient, r, is 1 or -1, does that mean the E (Epsilon, which is the "noise" around the regression line) = 0 ?
+A: 
+-----------------------------------------------------------------------------------
+
+Q: For the  y = B0 + B1x + e, When the B1 = 0(which is our Ho: B1 = 0), doesn't that also mean the mu = B0? If so, can we also state our "Ho: mu = B0" ?  
+
+A: Although that's right, most of the time in statistics, we don't care about the B0 (y-intercept). Since the trend(slope) is more important than where it starts(intercept), that's why we focus on the B1 more than B1 in the statement.
+-----------------------------------------------------------------------------------
+
+math_lm <- lm(Score ~ ConfidenceRatingMean, data = math) # lm stands for "linear model"
+
+!! Conclusion (of linear model): Since the p-value of our ConfidenceRatingMean value is lower , I have sufficient evidence to suggest that there's a linear relationship between the math exam score and student confidence report value.
+
+Q: What is the residuals?
+A: Residual = Observed(data points) - Expected(mean)
+
+Q: What is the linear regression equation?
+A: $$ y = \beta_0 + \beta_1X_1 + \epsilon$$
+-----------------------------------------------------------------------------------
+
+Epsilon: The variability around the "perfect" line. 
+
+Q: Should I make a model that fits "everything?"?
+A: No. Remember, the purpose of linear regression model is to predict the reality. If the reality has some uncertainty, than the uncertainty should be keeped in the regression model.
+
+Q: What is the best residual analysis result?
+A: Unbiased, no patterns, and the residual is equally distributed around 0.
+-----------------------------------------------------------------------------------
+
+#Letters: 
+Greek letters signify "population" parameters in statistics.
+Latin letters are often used for "sample" statistics.

@@ -1,0 +1,268 @@
+---
+title: "Unit 5 Assessment"
+subtitle: "Hypothesis Tests Continued"
+author: "Ivan Cheng"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Introduction
+
+This assessment is designed as a practice of several analyses we have covered throughout the semester.  Each example will give background for the research questions.  
+
+You are responsible for determining the appropriate alternative hypothesis for each question **based on context**.  Unless otherwise specified, use $\alpha = 0.05$.
+
+Do all work __ON YOUR OWN__.  
+
+You may use class notes and assignments but not internet searches, Artificial Intelligence or other people.  
+
+Don't forget to load the libraries.
+
+```{r, include=FALSE}
+
+library(tidyverse)
+library(rio)
+library(mosaic)
+library(car)
+
+```
+
+
+
+# Diet and Exercise
+
+A health nutritionist wanted to study the effects of three different diets on people.  He randomly chooses 43 individuals who are willing to participate in his study and randomly assigns them to be fed a certain kind of diet. After two weeks of being on the diet, he has each person run a mile and records the time it takes each of them to run the same mile. 
+
+```{r}
+
+running <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/Running.xlsx') %>% mutate(Diet = factor(Diet))
+glimpse(running)
+```
+
+Create a side-by-side boxplot using `ggplot()`.  Be sure to give it a title.  Color the boxes based on Diet.  
+
+```{r}
+ggplot(running, aes(x = Diet, y = minutes_to_run_mile, fill = Diet)) + 
+  geom_boxplot() + 
+  labs(
+    title = "Relastionship between Different Diets and Time cost of 1 mile Run "
+  ) + 
+  theme_bw()
+
+```
+
+
+__QUESTION__:  What type of test is required for this data?  
+__ANSWER__:  ANOVA test because there are 3 categorical explanatory variables and the response variables are quantitative.
+
+__QUESTION__:  State the null and alternative hypothesis for this test.  
+__ANSWER__:  
+$$ H_o: u_{Diet1} = u_{Diet2} = u_{Diet3}$$
+$$ H_a : \text{At least one of the u is different than each other} $$
+
+Perform the appropriate test to determine if the diet has any effect on the time it takes individuals to run a mile.  
+
+```{r}
+running_aov <- aov(running$minutes_to_run_mile ~ running$Diet)
+summary(running_aov)
+
+```
+
+
+Check the requirements for the appropriateness of the statistical test:
+
+```{r}
+# Check if residuals are normally distributed: Yes
+qqPlot(running_aov$residuals)
+
+# Check for equal standard deviation: Yes
+sds = favstats(running$minutes_to_run_mile ~ running$Diet)$sd
+max(sds) / min(sds) # = 1.565944
+
+```
+
+
+__QUESTION__:  Explain each of the requirements and whether or not they are satisfied.  
+__ANSWER__:  
+Requirement 1: Check if residuals are normally distributed: Yes, according to qqPlot graph, we can know the residuals are normally distributed.
+Requirement 2: Check for equal standard deviation: Yes, since the ratio of biggest sd and smallest sd = 1.565944 (which is less than 2), it passed the equal standard deviation test.
+
+__QUESTION__:  What is your conclusion for the hypothesis test?  
+__ANSWER__:  I have sufficient evidence to suggest that the 1 mile running time among people with different diet, on average, not all equal to each other.
+
+
+# Location, Location, Location!
+
+You are thinking of moving to British Columbia. You wanted to study the estimated sale price for a one-bedroom apartment in Nelson, BC. You collected a sample of 12 apartments located within the certain distance from downtown and record their price. You would like to predict the price of an apartment (in thousands of dollars) based on how far it is from downtown (in kilometers)
+
+```{r}
+
+apartments <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/Appartments.xlsx')
+glimpse(apartments)
+```
+
+
+__QUESTION__:  What is the response variable?  
+__ANSWER__:  The apartment price
+
+__QUESTION__:  What is the explanatory variable?  
+__ANSWER__:  The distance (kilometers away from downtown)
+
+Use `ggplot()` to create a scatter plot with a regression line.
+
+```{r}
+ggplot(apartments, aes(x = kilometers_from_downtown, y = price)) +
+  geom_point(color = "darkblue") +
+  labs(
+    title = "The Relationship between Apartment Price and Distance away From Down Town in British Columbia"
+  ) +
+  theme_bw() +
+  geom_smooth(method = "lm")
+
+
+```
+
+
+__QUESTION__:  Does the relationship between x and y appear linear?  
+__ANSWER__:  Yes.
+
+__QUESTION__:  What is the correlation coefficient?  
+__ANSWER__:  -0.7100981
+
+```{r}
+cor(apartments$price, apartments$kilometers_from_downtown)
+```
+
+__QUESTION__:  What does the correlation coefficient show us about this relationship?  
+__ANSWER__:  The strength of this relationship is moderate high and its direction is negative.
+
+__QUESTION__:  State the relevant null and alternative hypothesis for the regression analysis.  
+__ANSWER__:  
+$$ H_o : \beta_1 = 0$$
+$$ H_a : \beta_1 \neq 0$$
+
+Perform the appropriate analysis:
+
+```{r}
+apartments_lm <- lm(apartments$price ~ apartments$kilometers_from_downtown)
+summary(apartments_lm)
+
+```
+
+__QUESTION__:  Interpret the slope of the regression line in context of the problem.    
+__ANSWER__:  When the apartment distance from downtown increase 1 unit (1 km), the apartment price decrease -5379 on average.
+
+__QUESTION__:  Interpret the intercept of the regression line in context of the problem.   
+__ANSWER__:  When the apartment distance from downtown = 0 (at the downtown), the apartment price is 71839 on average.
+
+Create a confidence interval for the slope.
+
+```{r}
+confint(apartments_lm, level = 0.95)
+
+```
+
+__QUESTION__:  Interpret the confidence interval for the slope in context of the problem.   
+__ANSWER__:  I'm 95% confident that the true population slope is somewhere between -9136.587 and -1620.879.
+
+Check the requirements for the appropriateness of the analysis.  
+
+```{r}
+# 1. Checking for linear relationship
+ggplot(apartments, aes(x = kilometers_from_downtown, y = price)) +
+  geom_point(color = "darkblue") +
+  labs(
+    title = "The Relationship between Apartment Price and Distance away From Down Town in British Columbia"
+  ) +
+  theme_bw() +
+  geom_smooth(method = "lm")
+
+# 2. Check if the residuals are normally distributed
+qqPlot(apartments_lm$residuals)
+
+# 3. Check for the constant variance 
+plot(apartments_lm, which = 1)
+
+```
+
+__QUESTION__:  Do the residuals appear to be normally distributed?  
+__ANSWER__:  Yes.
+
+__QUESTION__:  Do the residuals appear to have constant variance?  
+__ANSWER__:  Yes.
+
+
+# Ahhh choo!
+
+A college health center conducted an experiment to determine the degree of relief provided by three cough remedies.  Each cough remedy was tried on 50 randomly selected students and the following counts were recorded.  We want to test the hypothesis that the three cough remedies are equally effective.
+
+```{r}
+
+cough <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/cough_relief.csv') %>% mutate(Relief = factor(Relief, levels = c("No relief", "Some relief", "Complete relief")))
+
+glimpse(cough)
+unique(cough)
+```
+
+Create a contingency table of counts for Relief and Remedy.
+
+```{r}
+addmargins(table(cough$Relief, cough$Remedy))
+
+```
+
+
+Create a proportion table for the percent of Relief for the different types of Remedies (Relief proportions should sum to 1 for each Remedy type.)
+
+```{r}
+prop.table(table(cough$Relief, cough$Remedy), margin = 2)
+
+```
+
+__QUESTION__:  Which remedy has the highest proportion of Complete Relief?  
+__ANSWER__:  Triaminic
+
+__QUESTION__:  What is the proportion of respondents who felt Complete Relief from NyQuil?  
+__ANSWER__:  0.140
+
+
+Perform a Chi-square test of independence:
+
+```{r}
+cough_table <- table(cough$Remedy, cough$Relief)
+cough_table <- table(cough$Relief, cough$Remedy)
+
+
+chisq.test(cough_table)
+
+chisq.test(cough_table)$expected >= 5
+
+```
+
+__QUESTION__:  State the Null and Alternative Hypotheses.  
+__ANSWER__:  
+$$ H_o : \text{The degree of relief is independent from the remedies.} $$
+$$ H_a : \text{The degree of relief is not independent from the remedies.} $$
+```{r}
+ggplot(cough, aes(x = Remedy, fill = Relief)) +
+  geom_bar(position = "dodge") +
+  theme_minimal()
+
+```
+
+
+__QUESTION__:  State your conclusion.   
+__ANSWER__:  Since the p-value is higher than alpha value(0.1318 > 0.05), I have sufficient evidence to suggest that the degree of relief is independent from the remedies.
+
+__QUESTION__:  What are the requirements for the chi-square test, and are they satisfied?  
+__ANSWER__:  We only need to check if each category counts are greater than 5. Yes, they are all satisfied.
+

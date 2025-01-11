@@ -1,0 +1,190 @@
+---
+title: "Who Shot First?"
+subtitle: "Categorical Data Application Activity"
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Introduction
+
+A long time ago, in a galaxy far, far away, in a wretched hive of scum an viallany, there was an altercation between bounty hunters Han Solo and Greedo.  During said altercation, blasters were drawn and shots fired.  Greedo ended up as bantha foddor and Solo walked away without a scratch.  The question is, who shot first?[^1]  
+
+This controversy has roiled Star Wars fandom for the better part of 2 decades.  Your answer to the question that question may reveal more about you than you might think.  
+
+We will use data from the [survey](https://fivethirtyeight.com/features/americas-favorite-star-wars-movies-and-least-favorite-characters/) conducted by FiveThirtyEight to answer some crucial questions about the first 6 movies including:  
+
+  1. What proportion of respondents are very favorable towards Emperor Palpatine?  
+  2. Are gender and favorability towards Jar-Jar Binks Independent? 
+  3. Is response to the question "Who Shot First?" independent of income?   
+
+
+Answer the qestions below and turn in your rendered HTML file.  
+
+# Data and Analysis
+
+Load the Data and Libraries:
+
+```{r}
+library(tidyverse)
+library(mosaic)
+library(rio)
+library(ggplot2)
+
+sw <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/StarWarsData_clean.csv') %>% mutate(Household.Income = factor(Household.Income, levels = c("$0 - $24,999", "$25,000 - $49,999", "$50,000 - $99,999", "$100,000 - $149,999",  "$150,000+")))
+
+```
+
+
+__QUESTION__:  What proportion of respondents are very favorable towards Emperor Palpatine?
+
+```{r}
+names(sw)
+
+addmargins(table(sw$`Favorability_Emperor Palpatine`)) 
+# Q: What's the difference between addmargins() and only using table() for one category?
+# A: You can get the sum and the specific numbers from addmargins() then calculate the percentage manually. For table(), it's just a table with the proportion numbers
+table(sw$`Favorability_Emperor Palpatine`)
+
+```
+__ANSWER__:  110 out of 834 people.
+
+
+
+# Gender and Jar-Jar
+
+Create a clean dataset to explore the relationship between gender and favorability towards Jar-Jar Binks. Make sure to drop all missing values.  
+
+```{r}
+unique(sw$Gender)
+unique(sw$`Favorability_Jar Jar Binks`)
+
+jarjar <- sw %>% 
+  select(Gender, `Favorability_Jar Jar Binks`) %>%
+  filter(Gender != '',
+         `Favorability_Jar Jar Binks` != '')
+
+glimpse(jarjar)
+unique(jarjar$`Favorability_Jar Jar Binks`)
+
+```
+
+
+Use the `jarjar` dataset and __GGPLOT__ to create a graph that shows the favorability distributions for Female and Male respondents.  
+
+Remember, some groupings tell a more understandable story.  Try switching the color variable and the x variable and see which grouping makes more sense. 
+
+```{r}
+ggplot(jarjar, aes(x = `Favorability_Jar Jar Binks`, fill = Gender))+ # Use fill = "column" to fill the color depends on the column
+  geom_bar(position = "dodge") + # Use position = "dodge" to have side-by-side effect
+  labs(
+    title = "Groups via genders among Favorability of Jar Jar Binks"
+  ) + 
+  theme_bw()
+
+```
+
+__QUESTION__:  Based on the graph, does it look like there is a difference in favorability distributions between genders?  
+__ANSWER__:  Yes. In the favorably categories, female tend to have higher favorability than male. On the contrast, in unfavorably categories, male tend to have higher unfavorability than female.
+
+# A 'contingency table' is a data table that compares two variables.
+
+Create a contingency table for gender and favorability towards Jar-Jar Binks.   
+
+```{r}
+table(jarjar$`Favorability_Jar Jar Binks`, jarjar$Gender)
+addmargins(table(jarjar$`Favorability_Jar Jar Binks`, jarjar$Gender))
+```
+
+
+Create a proportion table that shows the percentage breakdown of males and females within each favorability rating for Jar-Jar Binks.  This should sum to 1 across favorability for each gender.  
+
+```{r}
+prop.table(table(jarjar$`Favorability_Jar Jar Binks`, jarjar$Gender), margin = 2) 
+# margin = 1 is making the row total, = 2 is making the colunmn total
+```
+
+
+__QUESTION__:  What percent of female respondents are very favorable towards Jar-Jar Binks?  
+__ANSWER__:  15.93830%
+
+
+__QUESTION__:  What percent of male respondents are very favorable towards Jar-Jar Binks?  
+__ANSWER__:  11.29808%
+
+
+Test to see if favorability and gender are independent.
+
+```{r}
+jarjar_table <- table(jarjar$`Favorability_Jar Jar Binks`, jarjar$Gender)
+
+chisq.test(jarjar_table)
+```
+$$H_0: \text{The row variable is independent of the column variable}$$
+$$H_A: \text{The row variable is not independent of the column variable}$$
+
+
+__QUESTION__:  Based on the results from the Chi-square test, are favorability and gender are independent?  
+__ANSWER__:  No. Since the p-value is very low (6.896e-05), we can suggest that the favorability is not independent of the gender.
+
+
+## Who Shot First?  
+
+Create a clean dataset to explore the relationship between income level and response to the question, "Who Shot First?".  Make sure to drop all missing values.  
+
+```{r}
+
+shot_first <- sw %>% 
+  select(who_shot_first, Household.Income) %>%
+  filter(who_shot_first != '',
+         Household.Income != '')
+
+glimpse(shot_first)
+```
+
+
+Use the `shot_first` dataset and __GGPLOT__ to create a graph that shows the income distribution and response to the question "Who Shot First?"  
+
+Remember, some groupings tell a more understandable story.  Try switching the color variable and the x variable and see which grouping makes more sense.  
+
+```{r}
+ggplot(shot_first, aes(x = who_shot_first, fill = Household.Income)) +
+  geom_bar(position = "dodge") + 
+  labs(
+    title = "The Relationship between Who Shot First Answer and Household Income"
+  ) + 
+  theme_bw()
+
+ggplot(shot_first, aes(x = Household.Income, fill = who_shot_first)) +
+  geom_bar(position = "dodge") + 
+  labs(
+    title = "The Relationship between 'Who Shot First' Answer and Household Income"
+  ) + 
+  theme_bw()
+
+```
+
+__QUESTION__:  Based on the graph, does it look like there is a different response profile to "who shot first" for different income ranges?  
+__ANSWER__:  No. In each income range, the answer 'Greedo' is the lowest one and there's not a lot of difference between the answer 'Han' and 'I don't understand this question' answers.
+
+
+Test to see if income and response to the question "who shot first" are independent.
+
+```{r}
+shot_table <- table(shot_first$Household.Income, shot_first$who_shot_first)
+
+chisq.test(shot_table)
+```
+
+__QUESTION__:  Based on the results from the Chi-square test, are income and response to the question "who shot first" independent?  
+__ANSWER__:  Yes. Since the p-value (0.5726) is significant higher than alpha value, we can suggest that the average household income is independent to the answer of 'Who shot first'.
+
+
+
+[^1]:  For the definitive answer to the question, see [Who Shot First](https://youtu.be/mH19gKo7W7w?si=0RdxK_0rbc-XDlSt)
+
+
+

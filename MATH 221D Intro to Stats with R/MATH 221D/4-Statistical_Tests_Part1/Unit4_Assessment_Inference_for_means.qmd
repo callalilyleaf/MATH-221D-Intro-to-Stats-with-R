@@ -1,0 +1,335 @@
+---
+title: "Hypothesis Testing for Means"
+subtitle: "Unit 4 Assessment"
+author: "Ivan Cheng"
+format:
+  html:
+    self-contained: true
+    embed-resources: true
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Introduction
+
+This assessment is designed as a practice of several analyses we have covered in unit 4.  Each example will give background for the research questions.  
+
+You are responsible for determining the appropriate alternative hypothesis for each question **based on context**.  Unless otherwise specified, use $\alpha = 0.05$.
+
+Do all work __ON YOUR OWN__.  
+
+You may use class notes and assignments but not internet searches, Artificial Intelligence or other people.  
+
+Don't forget to load the libraries.
+
+```{r, include=FALSE}
+library(tidyverse)
+library(rio)
+library(mosaic)
+library(car)
+
+```
+
+
+
+# One-sample Z
+
+There are estimated 234 nesting pairs of bald eagles in Idaho.  With a chick survival rate of about 72% and nesting pairs laying 1-3 eggs, the population in Idaho is expected to grow by, on average, 168.48 with a standard deviation of 16.86.
+
+Favorable nesting conditions this year suggest that survival rates should be higher than expected.  We randomly select 35 nesting sites and calculate the survival rate to be 82%, meaning we expect population to grow by 187.2.  
+
+Test to see if this growth is significantly higher than historical growth.
+
+__QUESTION__:  State your null and alternative hypotheses:  
+$$ H_o : u_{Hisgrow} = u_{thisyeargrow} $$
+$$ H_a : u_{Hisgrow} < u_{Thisyeargrow} $$
+
+
+Perform the appropriate hypothesis test:
+
+```{r}
+xbar <- 187.2
+mu <- 168.48
+sigma <- 16.86
+n <- 35
+sigma_xbar <- sigma / sqrt(n)
+sigma_xbar
+
+z <- (xbar - mu)/ sigma_xbar
+z
+
+pnorm(z)
+
+1-pnorm(z)
+
+```
+
+
+__QUESTION__:  What is the the test statistic (z)?  
+__ANSWER__:  6.568743
+
+
+__QUESTION__:  What is the the P-value?  
+__ANSWER__:  1, for the possibility getting a higher growth than 187.2 is 2.537082e-11, which is extremely low.
+
+
+__QUESTION__:  State your conclusion:  
+__ANSWER__:  The possibility to have average population growth by 187.2 is significantly higher than the historical growth.
+
+
+__QUESTION__:  Check the test requirements for a one-sample z-test (can we trust the p-value? Why or why not?):
+__ANSWER__:  Yes, since the sample size is big enough (> 30), the distribution is normally distributed. Thus, we can trust the p-value.
+
+
+
+# One-sample t
+
+The label on a protein bar wrapper claims 20 grams of protein.  We select a random sample of 31 bars and test to see if there is significantly less protein than advertised.  
+
+
+```{r}
+# Data from (https://www.jmp.com/en_us/statistics-knowledge-portal/t-test/one-sample-t-test.html)
+
+data <- c(20.70, 27.46, 22.15, 19.85, 21.29, 24.75, 20.75, 22.91, 25.34, 20.33, 21.54, 21.08, 22.14, 19.56, 21.10, 18.04, 24.12, 19.95, 19.72, 18.28, 16.26, 17.46, 20.53, 22.12, 25.06, 22.44, 19.08, 19.88, 21.39, 22.33, 25.79)
+
+```
+S for sample. 
+
+__QUESTION__:  State your null and alternative hypotheses:  
+$$ Ho:  u_{S} = 20 $$
+$$ Ha:  u_{S} < 20 $$
+$$ \alpha = 0.05 $$
+Perform the appropriate hypothesis test:
+
+```{r}
+favstats(data)
+t.test(data, mu = 20, alternative = "less")
+
+```
+
+
+__QUESTION__:  What is the the test statistic (t)?  
+__ANSWER__:  3.0668
+
+__QUESTION__:  What is the the P-value?  
+__ANSWER__:  0.9977
+
+__QUESTION__:  State your conclusion:  
+__ANSWER__:  I have sufficient evidence to suggest that the true mean of the protein ingredient weight in the protein bar equals to  20 grams.
+
+
+__QUESTION__:  Check the requirements for a one-sample t-test (can we trust the p-value?  Why or why not?):  
+__ANSWER__:  Yes, since the sample size is big enough (31 > 30), we can trust the p-value.
+
+
+Create a 95% confidence interval for the mean protein content:  
+
+```{r}
+t.test(data, conf.level = 0.95)$conf.int
+
+```
+
+
+__QUESTION__:  Interpret the confidence interval in context of the problem:  
+__ANSWER__:  I'm 95% confident that the true mean of protein ingredient weight of the protein bar is located between 20.46771 and 22.33229.
+
+
+
+# 2-sample t:  Dependent (Matched Pairs)
+
+An instructor would like to use 2 exams in her classes next year.  She hopes they are comparable, meaning as long as they're not too different from each other, she feels confident using either exam.  
+
+Each student took both exams.
+
+```{r}
+# Data and example come from JMP (https://www.jmp.com/en_us/statistics-knowledge-portal/t-test/paired-t-test.html)
+
+exam <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/Exam_Comparison.csv')
+
+glimpse(exam)
+
+favstats(exam$`Exam 1 Score`)
+favstats(exam$`Exam 2 Score`)
+
+exam_diff <- exam$`Exam 2 Score` - exam$`Exam 1 Score` 
+# positive means exam2 score is higher, negative means exam1 score is higher
+```
+
+__QUESTION__:  State your null and alternative hypotheses:  
+$$ Ho: u_{diff} = 0 $$
+$$ Ha: u_{diff} > 0 $$
+$$ \alpha = 0.05 $$
+Perform the appropriate hypothesis test:
+
+```{r}
+# positive means exam2 score is higher, negative means exam1 score is higher
+t.test(exam_diff, alternative = "greater")
+
+```
+
+
+__QUESTION__:  What is the the test statistic (t)?  
+__ANSWER__:  0.74978
+
+__QUESTION__:  What is the the P-value?  
+__ANSWER__:  0.2325
+
+__QUESTION__:  State your conclusion:  
+__ANSWER__:  I have sufficient evidence to suggest that the difference between exam 1 and exam 2, in average, equals to 0.
+
+
+```{r}
+qqPlot(exam_diff)
+```
+
+
+__QUESTION__:  Check the requirements for a two-sample, dependent t-test:
+__ANSWER__:  Although both sample numbers aren't big enough to be assured as normally distributed, the QQPlot graph indicate the exam_diff samples are normally distributed. Thus, we can trust the P-value. 
+
+Create a 95% confidence interval for the mean of the differences in test scores:
+
+```{r}
+t.test(exam_diff, conf.level = 0.95)$conf.int
+```
+
+
+__QUESTION__:  Interpret the confidence interval in context of the problem:  
+__ANSWER__:  I'm 95% confident that the true mean of the difference between exam 1 and exam 2 is located between -2.418647 and 5.043647.
+
+
+# 2-sample t:  Independent
+
+We would like to see if women have a higher body fat percent than men.  We randomly select 10 Females and 13 males and collect their body fat percents.  
+
+```{r}
+
+body_fat <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/body_fat_percent.csv')
+
+glimpse(body_fat)
+
+boxplot(body_fat$body_fat_percent ~ body_fat$Gender)
+```
+
+__QUESTION__:  State your null and alternative hypotheses:  
+$$ Ho: u_{F} = u_{M}  $$
+$$ Ha: u_{F} > u_{M} $$
+$$ \alpha = 0.05 $$
+Perform the appropriate hypothesis test:
+
+```{r}
+t.test(body_fat$body_fat_percent ~ body_fat$Gender, alternative = "greater")
+# Although sometimes the outcome of data seems weird, finish all and let the numbers talk to you. Listen to the stats first and see why it states as it is.
+```
+
+
+__QUESTION__:  What is the the test statistic (t)?  
+__ANSWER__:  1.6444
+
+__QUESTION__:  What is the the P-value?  
+__ANSWER__:  0.05909 (bigger than our alpha value 0.05)
+
+__QUESTION__:  State your conclusion:  
+__ANSWER__:  I have sufficient evidence to suggest that the true mean of body fat between female and male equal to each other.
+
+```{r}
+qqPlot(body_fat$body_fat_percent ~ body_fat$Gender)
+```
+
+
+__QUESTION__:  Check the requirements for an independent, 2-sample t-test:
+__ANSWER__:  The QQPlot graph shows these two data set are both normally distributed.
+
+
+Create a 95% confidence interval for the difference in mean body weights between males and females:  
+
+```{r}
+t.test(body_fat$body_fat_percent ~ body_fat$Gender, conf.level = 0.95)$conf.int
+
+```
+
+
+__QUESTION__:  Interpret the confidence interval in context of the problem:  
+__ANSWER__:  I'm 95% confident that the real mean difference of body fat between female and male is located between -1.504523 and 12.192215.
+
+
+# ANOVA
+
+A manufacturer has received complaints that an adhesive's efficacy is variable.  Viscosity of an adhesive is related to it's effectiveness.  You decide to randomly select 5 bottles of adhesive from 5 different production batches and see if there are differences between the batches (called lots in the data.)
+
+```{r}
+# Example and data come from the JMP statistical software website
+# https://www.jmp.com/en_us/statistics-knowledge-portal/one-way-anova.html
+
+
+viscosity <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/Viscosity_anova.csv')
+
+glimpse(viscosity)
+unique(viscosity$Lot)
+
+re <- viscosity %>%
+  group_by(Lot) %>%
+  mutate(group_mean = mean(Viscosity), 
+         residual = Viscosity - group_mean) %>%
+  select(-Comments)
+
+re
+
+# Lot: A-E
+```
+
+
+__QUESTION__:  State your null and alternative hypotheses:  
+$$ Ho:  u_A = u_B = u_C = u_D = u_E$$
+$$ Ha: At\ least\ one\ of\ them\ not\ equals\ to\ one\ another $$
+
+Perform the appropriate hypothesis test:
+
+
+```{r}
+aov_viscosity <- aov(viscosity$Viscosity ~ viscosity$Lot)
+
+summary(aov_viscosity)
+```
+
+
+__QUESTION__:  What is the the test statistic (F)?  
+__ANSWER__:  6.899
+
+__QUESTION__:  What is the the P-value?  
+__ANSWER__:  0.00117
+
+__QUESTION__:  State your conclusion:  
+__ANSWER__:  I have sufficient evidence to suggest that the mean viscosity score between lot A to lot E not all equal to each other.
+
+```{r}
+sds = favstats(viscosity$Viscosity ~ viscosity$Lot)$sd
+
+max(sds)/ min(sds)
+
+qqPlot(aov_viscosity)
+```
+
+
+__QUESTION__:  Check the requirements for ANOVA (Can we trust the p-value? Why or why not?):  
+__ANSWER__:  Yes we can trust the p-value since both the equal standard deviation test (ratio between max sd and min sd < 2) and qqPlot show the aov distributions are normally distributed. 
+
+```{r}
+ggplot(data = viscosity, mapping = aes(x = Lot, y = Viscosity, fill = Lot)) + 
+  geom_boxplot()
+    
+```
+
+
+Create a side-by-side boxplot __using GGPlot__ looking at viscosity for each lot.  
+
+__QUESTION__:  Based on the boxplot, can you make any reasonable inferences beyond the ANOVA hypothesis test conclusion?  
+__ANSWER__:  Because the viscosity score distribution of Lot C is far lower from the other 4 Lots, that's why the possibility that they have the same mean so low. 
+
+
+

@@ -1,0 +1,318 @@
+---
+title: "Application Activity"
+subtitle: "Mid-Term Review"
+author: "Ivan Cheng"
+format:
+  html:
+    self-contained: true
+    embed-resource: true
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+# Assessment Objectives
+
+  * Apply the 3 rules of probability in different scenarios
+  * Describe the 5 steps of the statistical process
+  * Differentiate between an observational study and an experiment
+  * Differentiate between a population and a sample
+  * Describe the 4 random sampling schemes
+  * Explain importance of random sampling
+<br/>
+  * Distinguish between quantitative and categorical variables
+  * Create graphical summaries of data (boxplots, histograms) and be able to make conclusions based on the graphs
+  * Create numerical summaries of data (mean, sd, 5 number summary, percentiles) and compare groups (centers, spreads)
+  * Distinguish between a parameter and a statistic
+  * Determine the 5 number summary from a boxplot
+<br/>
+  * State the properties of a normal distribution
+  * Calculate the z-score for an individual from a normal population with mean, $\mu$, and std. dev, $\sigma$
+  * Calculate probabilities (>, <, between) of certain values given $\mu$ and $\sigma$
+<br/>
+  * Describe the concept of a sampling distribution of the sample mean
+  * State the Central Limit Theorem
+  * Determine the mean of the sampling distribution of the sample mean given $\mu$ and $\sigma$
+  * Determine the std. dev. of the sampling distribution of the sample mean given $\mu$ and $\sigma$
+  * Determine the _shape_ of the sampling distribution given a sample size, n, and $\mu$ and $\sigma$
+  * State the Law of Large Numbers
+  
+  
+# Design the Study
+
+You and a colleague are interested in studying the relationship between social media use and mental health among youth ages 18-24. You decide to use the Psychological Wellbeing Scale (PWB) developed by Stanford University as your metric for comparison (the response variable).
+
+__QUESTION__:  List 5 factors (explanatory variables) related to social media use that might impact Wellbeing.  Include whether or not the factors are *quantitative* or *categorical* (include at least one of each):  
+
+1. Daily average time usage (quantitative)
+2. Most frequent activity (categorical: posting, reading posts, watching reels...etc.)
+3. platform (categorical, fb, ig, snapchat, tiktok...etc.)
+4. Daily checking frequency(categorical, 0~15mins, 15~30mins, 30~60mins, 1~2hrs...etc.)
+5. Friends/ Followers number (quantitative)
+
+__QUESTION__:  What is the population of the study?  
+__ANSWER__:  youth ages 18-24
+
+
+__QUESTION__:  Suppose you are *not* resource limited.  Briefly describe the sampling scheme you would use and why you would choose it to best represent the population:
+__ANSWER__:  Since youth among 18-24 years old are usually college students, I will use stratified sampling to separate them into groups such as: Freshman, Sophomore, Junior, Senior, Graduate, and non-student. Since study and working would be the main focus to the people in this age range, these categories can easily reflect the social media well-being in different phase of their life.
+
+ 
+__QUESTION__:  Give a brief description of the other 3 types of sampling schemes and explain why they don't make sense in this situation.   
+__ANSWER__:  
+  Simple random sampling. I will utilize this sampling as well. It just not the main sampling method I will use. It's good to have "random" samples from the data set. However, only use Simple random sampling for the whole samples may cause bias samples and can't observe the simple pattern among chaotic samples.
+  Systematic sampling, as another way to get the non-bias samples, it might be a good choice for collecting samples, but again, it's not the main type of sampling scheme I will use since I want the different categories.
+  For Cluster sampling, obviously, we don't see some obvious "clusters" to separate the data in this situation. However, the principle of this sampling method is similar to stratified sampling, to get the samples equally from multiple areas/ categories.
+
+
+__QUESTION__:  Suppose it is impractical to sample from the population described in Q1.2.  What population might be more feasible to sample from?  
+__ANSWER__:  Then, I will probably loosen the age range to 8-30 years old. Here are the categories: 8-12, 13-17, 18-24, 24-30.
+
+__QUESTION__: 
+How would modifying the population of interest impact your sampling scheme?  
+__ANSWER__:  If the population is bigger, I will probably change another sampling method. However, it the population I mentioned in the last question work, I will still use stratified sampling.
+
+
+__QUESTION__: 
+Suppose you sent out a Facebook survey to all of your followers and asked them to respond if they are in your target demographic.  How might this impact the conclusions of your study?  
+__ANSWER__:  Obviously, the data you collect is going to be the people among your friends. If your follower or friend zone isn't big enough, the conclusions won't be accurate.
+
+
+# Describe/Summarize the Data
+
+For this section you will program in R.  Don't forget to load the libraries first:
+
+```{r, echo=FALSE, include=FALSE}
+
+library(rio)
+library(mosaic)
+library(tidyverse)
+library(car)
+
+```
+
+
+## Housing Prices in Rexburg
+
+You are interested housing prices in Rexburg, Idaho.  Load and wrangle the housing data and respond to the following questions.  
+
+```{r}
+
+# Load the data:
+housing <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/MadisonCountyRealEstate.xlsx') %>% mutate(Bedrooms=factor(Bedrooms))
+view(housing)
+
+```
+
+Create a new dataset called `rexburg` that includes:
+
+  1. Only houses in the city of Rexburg
+  2. Houses that are less than 20 years old
+  3. Only the columns for List Price, City, Age and number of bedrooms
+
+```{r}
+rexburg <- housing %>%
+  filter(City %in% c("REXBURG"),
+         Age < 20,) %>%
+  select(ListPrice, City, Age, Bedrooms)
+
+rexburg
+  
+  
+```
+
+
+Create a histogram of listing price with the `rexburg` dataset. 
+
+```{r}
+histogram(rexburg$ListPrice)
+
+```
+
+__QUESTION__:  What is the shape of the distribution of list prices for homes in Rexburg?  
+__ANSWER__:  Right Skewed
+
+
+__QUESTION__:  Calculate the mean, standard deviation, 5 number summary and sample size of housing prices for each number of bedrooms.  
+__ANSWER__:  
+ rexburg$Bedrooms    min     Q1 median      Q3     max     mean        sd  n missing
+1                2  96900 106500 111750  127425  136500 116015.0  12822.81 20       0
+2                3 124900 142900 189900  217400  499999 199930.7  77604.73 39       0
+3                4 169000 192000 221000  269900  369000 247411.1  74364.90  9       0
+4                5 164900 219900 254450  298500  924500 294965.0 162580.24 20       0
+5                6 179900 274000 324900  379000  699000 348700.0 125531.97 13       0
+6                7 539900 717450 895000 1185000 1475000 969966.7 472036.02  3       0
+
+
+```{r}
+favstats(rexburg$ListPrice ~ rexburg$Bedrooms)
+
+```
+
+__QUESTION__:  What is the standard deviation of prices of homes with 3 bedrooms?  
+__ANSWER__:  77604.73
+
+__QUESTION__:  Interpret the standard deviation in words.  
+__ANSWER__:  The average distance (difference) between all data and mean.
+
+
+__QUESTION__:  What is the maximum value home price for a 2 bedroom house?  
+__ANSWER__:  136500
+
+
+__QUESTION__:  Suppose there was a typo in the data and the maximum price for a 2 bedroom house was accidentally entered as $1,700,000.  How would the median change?  
+__ANSWER__:  It won't change a lot, just go to the next value right next to the original median.
+
+
+__QUESTION__:  How would the mean change?  
+__ANSWER__:  Get bigger
+
+__QUESTION__:  How would the standard deviation change?  
+__ANSWER__:  Get bigger as well
+
+
+__QUESTION__:  Use  __*GGPLOT*__ to create a boxplot of housing prices for all the bedroom numbers.  **Modify the color scheme so that each boxplot is a different color**.  
+
+```{r}
+ggplot(data = rexburg, mapping = aes(x=Bedrooms, y=ListPrice, fill = Bedrooms)) +
+  geom_boxplot() + 
+  geom_smooth(method = "lm") + 
+  labs(
+    x = "Bedroom Numbers",
+    y = "Housing Price",
+    title = "Housing Price among Different Bedroom Numbers" 
+  ) + 
+  theme_bw()
+
+```
+
+
+__QUESTION__:  What trends do you notice?  
+__ANSWER__:  The more bedroom a house has, the average housing price goes higher.
+
+__QUESTION__:  Why might the box plot for 7 bedroom homes look so different than the others?  
+__ANSWER__:  Because their data are more discrete than others. You can also say it has bigger standard deviation.
+
+
+# Probability 
+
+## Hair Color
+
+Brother Cannon has been collecting hair color data about his students for the last several semesters.  The proportion of students with each hair color are as follows:  
+(run the following R chunk to see the table more clearly)
+
+```{r}
+
+knitr::kable(tibble(Red="???", Brown=.37, Black=.35, Blond = .22, Other=.02))
+
+```
+
+__QUESTION__:  What percent of Brother Cannon's students have red hair?  
+__ANSWER__:  4%
+
+
+__QUESTION__:  What's the probability that a randomly selected student has either black or brown hair?  
+__ANSWER__:  0.72
+
+
+## Social Media Use
+
+The number of hours students spend on social media a week is known to be left skewed with a mean of 12 hours and a standard deviation 1.5. 
+
+Suppose we take a random sample of 50 students and calculate the average time they spend on social media.  
+
+
+__QUESTION__:  What is the mean of the distribution of sample means for this sample size?  
+__ANSWER__:  12
+
+```{r}
+
+```
+
+__QUESTION__:  What is the standard deviation of sample means for this sample size?  
+__ANSWER__:  0.212132
+
+```{r}
+sd = 1.5 / sqrt(50)
+sd
+```
+
+
+__QUESTION__:  What is the shape of the distribution of sample means for this sample size and why?  
+__ANSWER__:  Normal distributioin, which is symmetric bell shape since the sample amount is 50, which is big enough to transform the distribution into a normal distribution.
+
+
+## Faculty Salaries
+
+Faculty salaries at a university are known to be normally distributed with a mean of \$108,552 and a standard deviation of \$13,277.
+You randomly sample n=15 faculty members and calculate their average salary.  
+
+__QUESTION__:  What is the mean of the distribution of sample means for this sample size?  
+__ANSWER__:  108552
+
+__QUESTION__:  What is the standard deviation of sample means for this sample size?  
+__ANSWER__:  3428.107
+
+```{r}
+sd = 13277 / sqrt(15)
+sd
+```
+
+__QUESTION__:  What is the shape of the distribution of sample means for this sample size and why?  
+__ANSWER__:  Normal distribution since the orginal population is a normal distribution.
+
+
+## Normal Probability Calculations
+
+High blood pressure is strongly associated with a host of diseases and increases risk of cardiac arrest (hear attacks) in older patients.  
+Suppose that systolic blood pressure in the US is normally distributed with a mean = 128 and a standard deviation of 11.  
+Use the following calculator to answer the questions below: 
+
+```{r, include=FALSE, echo=FALSE, eval=FALSE}
+# Calculator
+xbar <- 130
+mu <- 128
+sigma <- 11
+n <- 10
+sigma_xbar <- sigma / sqrt(n)
+sigma_xbar
+z <- (xbar - mu) / sigma_xbar
+z
+# Probability of a sample mean being less than our xbar:
+pnorm(z)
+# Prob. of a sample mean being higher than our xbar:
+1-pnorm(z)
+# Prob of being between A and B
+A <- 
+B <- 
+  
+pnorm(B, mu, sigma_xbar) - pnorm(A, mu, sigma_xbar)
+# Percentiles
+percentile <- 0.2
+qnorm(percentile, mu, sigma)
+```
+
+
+__QUESTION__:  What is the probability that a randomly selected person in the US has a systolic blood pressure of greater than 145?  
+__ANSWER__:  0.06111818
+
+
+__QUESTION__:  What is the probability that a randomly selected group of 10 people in the US have an *average* blood pressure less than 130?  
+__ANSWER__:  0.7173407
+
+
+__QUESTION__:  Your doctor says that you are in the 20th percentile for systolic blood pressure.  What does it mean that you are the 20th percentile?  
+__ANSWER__:  Your score (blood pressure value) is higher then 20% of the population.
+
+
+__QUESTION__:  If you are the 20th percentile, What is your blood pressure?  
+__ANSWER__:  118.7422
+
+```{r}
+
+```
+
+

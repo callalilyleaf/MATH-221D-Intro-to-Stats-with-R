@@ -1,0 +1,4 @@
+"0","library(magick)
+"
+"2","Error in library(magick) : there is no package called ‘magick’
+"

@@ -1,0 +1,207 @@
+---
+title: ANOVA Practice
+format:
+  html:
+    self_contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Life Expectancy of Female Authors
+
+## Introduction
+
+You are curious to compare life expectancy between female poets, novelists, and non-fiction writers.  
+
+You take a sample of female authors from each of the three groups to test if the average age at death is different between any of the three types of authors using a level of significance of, $\alpha = 0.05$.
+
+## Load the Data and Libraries
+
+
+```{r}
+library(rio)
+library(tidyverse)
+library(mosaic)
+library(car)
+
+womenpoet <- rio::import("https://byuistats.github.io/BYUI_M221_Book/Data/womenpoet.xls")
+glimpse(womenpoet)
+```
+
+## Explore the Data
+
+Create a side-by-side boxplot of the age at death of each of the different author styles.
+
+Modify the colors of each of the boxes for each group.
+
+```{r}
+boxplot(womenpoet$Age ~ womenpoet$Type, main = "The Age of Different Women Writers", col = c(2,3,4))
+```
+
+
+Create a summary statistics table for age at death for each author type:
+
+```{r}
+favstats(womenpoet$Age ~ womenpoet$Type) %>% knitr::kable()
+
+```
+
+List the mean and standard deviations of age at death for:
+
+|womenpoet$Type |     mean|       sd|  n| missing|
+|:--------------|--------:|--------:|--:|-------:|
+|Nonfiction     | 76.87500| 14.09691| 24|       0|
+|Novels         | 71.44776| 13.05151| 67|       0|
+|Poems          | 63.18750| 17.29710| 32|       0|
+
+## Perform the Appropriate Analysis
+
+State your null and alternative hypotheses:
+
+$$ H_o = u_{Nonfiction} = u_{Novel} = u_{Poem}$$
+
+$$ H_a = At\ least\ one\ of\ the\ u\ not\ equals\ to\ another\ one. $$
+
+Perform an Analysis of Variance test including checking for the appropriateness of our analysis.
+
+```{r}
+aov_women_writer <- aov(womenpoet$Age ~ womenpoet$Type)
+aov_women_writer
+
+summary(aov_women_writer)
+
+```
+
+__Question__:  What is the test statistic (F-value)?
+__Answer__:  6.563
+
+
+__Question__:  What are the degrees of freedom for your analysis?
+  a. Numerator (between Groups) Degrees of Freedom
+  b. Denominator (within groups) Degrees of Freedom
+__Answer__:  a = 2; b = 120
+
+
+__Question__:  What is the P-value?
+__Answer__:  0.00197
+
+
+__Question__:  Do you reject the null hypothesis?  Why?
+__Answer__:  Yes, I will reject the null hypothesis since the P-value is less than alpha-value (0.00197 < 0.05)
+
+
+__Question__:  State your conclusion in context of the problem.
+__Answer__:  I have sufficient evidence to suggest that the average age among women writers in Nonficition, Novel, and Poem field are not all equal to each other.
+
+```{r}
+sds = favstats(womenpoet$Age ~ womenpoet$Type)$sd
+
+max(sds) / min(sds)
+
+qqPlot(aov_women_writer$residuals)
+```
+
+__Question__:  Can we trust the p-value?
+  a. Check for equal standard deviation (is the ratio of the largest SD / smallest SD greater than 2?)
+  b. Check Normality of the residuals (`qqPlot()`)
+__Answer__:  Yes. According to the result of equal standard deviation test (1.325295 < 2, test passed) and qqPlot graph (graph shows that the residuals are normal distributed), we can trust the p-value. 
+
+
+# Testing Mosquitos
+
+## Introduction
+
+A study was conducted to determine if different types of material can reduce the amount of mosquito human contact.  The researchers evaluated five different types of patches 1=Odomos, 2=Deltamethrin, 3=Cyfluthrin, 4=D+O, 5=C+O.  
+
+The amount of mosquito human contact was measured to assess any differences between the five different types of material. Use a level of significance of 0.05.
+
+## Load the Data
+
+```{r}
+
+MosquitoPatch <- rio::import("https://raw.githubusercontent.com/rdcromar/Math221D/main/MosquitoPatch.csv") %>% mutate(Treatment = factor(Treatment))
+
+glimpse(MosquitoPatch)
+```
+
+
+## Review the Data
+
+Create a side-by-side boxplot for human contact for each of the treatment groups.
+
+Add a title and change the colors of the boxes.  
+
+```{r}
+boxplot(MosquitoPatch$mosqs ~ MosquitoPatch$Treatment, main = "The Amount of Mosquito Human Contact with Different Patches", col = c(2,3,4,5,6))
+
+```
+
+Create a summary statistics table for human contact for each of the treatment groups:
+
+```{r}
+favstats(MosquitoPatch$mosqs ~ MosquitoPatch$Treatment) %>% knitr::kable()
+
+```
+
+__Question__:  What do you observe?
+__Answer__:  The patch which has the best performance in average is the Deltamethrin, the number 2 in the treatment column.
+
+__Question__:  What is the maximum standard deviation?
+__Answer__:  18.01, from patch Odomos
+
+__Question__:  What is the minimum standard deviation?
+__Answer__:  14.10 ,from patch Odomos + Cyfluthrin & Odomos + Deltamethrin
+
+
+## Perform the Appropriate Analysis
+
+State your null and alternative hypotheses:
+
+$$ H_o = u_{Odomos} = u_{Deltamethrin} = u_{Cyfluthrin} = u_{D+O} = u_{C+O}$$
+
+$$ H_a = At\ least\ one\ of\ the\ u\ not\ equals\ to\ another\ one. $$
+
+Perform an Analysis of Variance test including checking for the appropriateness of our analysis.
+
+```{r}
+aov_MosPatches <- aov(MosquitoPatch$mosqs ~ MosquitoPatch$Treatment)
+aov_MosPatches
+
+summary(aov_MosPatches)
+```
+
+__Question__:  What is the test statistic (F-value)?
+__Answer__:  4.48
+
+__Question__:  What are the degrees of freedom for your analysis?
+
+  a. Numerator (between Groups) Degrees of Freedom
+  b. Denominator (within groups) Degrees of Freedom
+__Answer__:  a = 4; b = 145
+  
+__Question__:  What is the P-value?
+__Answer__:  0.00192
+
+__Question__:  Do you reject the null hypothesis?  Why?
+__Answer__:  Yes, since the P-value is less than alpha-value (0.00192 < 0.05)
+
+__Question__:  State your conclusion in context of the problem.
+__Answer__:  I have sufficient evidence to suggest the average performance of reducing the amount of mosquito human contact among the 5 patches not all equal to each others.
+
+
+```{r}
+sds = favstats(MosquitoPatch$mosqs ~ MosquitoPatch$Treatment)$sd
+max(sds) / min(sds)
+
+qqPlot(aov_MosPatches$residuals)
+```
+
+__Question__:  Can we trust the p-value?
+  a. Check for equal standard deviation (is the ratio of the largest SD / smallest SD greater than 2?)
+  b. Check Normality of the residuals (`qqPlot()`)
+__Answer__:  Yes. According to the equal standard deviation test (1.149441 < 2, test passed) and the qqPlot graph of residuals (The dots are distributed in the blue area, which means the residuals are normal distributed), we can trust the P-value.
+
+
+
+

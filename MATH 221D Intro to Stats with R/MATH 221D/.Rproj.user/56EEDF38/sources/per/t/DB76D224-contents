@@ -1,0 +1,297 @@
+---
+title: Hypothesis Tests for Categorical Variables
+subtitle: Chi-Square Tests 
+format:
+  html:
+    self-contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+# Introduction
+
+In this section, we will discuss 2 types of statistical hypothesis tests for categorical data: 1) $\chi^2$ test of homogeneity and 2) $\chi^2$ test of indpendence.  
+
+__NOTE__:  The Greek letter, $\chi$, is pronounced like "ki" in "kite", __not__ like "chi" in "tai chi".
+
+# $\chi^2$ test of Homogeneity
+
+The Chi-Square Test of Homogeneity is used to determine whether the distribution of a categorical variable is the same across different groups. In other words, it assess whether the proportions of a characteristic are similar across different categories.
+
+## Key Characteristics
+
+  * Compares proportions across different groups  
+  * Uses categorical data  
+  * Determines if the distribution is consistent across populations  
+
+## Null and Alternative Hypotheses
+
+$H_0$: The proportions are the same across different groups  
+$H_a$ The proportions differ across groups  
+
+## Test Statistic Calculation
+
+The chi-square statistic is calculated using the formula:
+χ² = Σ [(Observed - Expected)² / Expected]  
+Where:  
+
+Observed = Actual count in each cell  
+
+Expected = Theoretical count based on proportions
+
+
+## Example
+
+Let's look at the Star Wars dataset.  
+
+```{r}
+library(tidyverse)
+library(mosaic)
+library(rio)
+library(ggplot2)
+
+sw <- read_csv('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/StarWarsData_clean.csv')
+
+yoda_table <- table(sw$Favorability_Yoda)
+sum(table(sw$Favorability_Yoda)) / 6
+
+prop.table(table(sw$Favorability_Yoda))
+
+yoda_chi <- chisq.test(yoda_table) # calculate all the math of: χ² = Σ [(Observed - Expected)² / Expected]
+yoda_chi
+
+yoda_chi$expected # Get the expected count for each proportion
+
+yoda_chi$residuals 
+
+
+
+```
+
+Recall that we can use the `table()` function to tabulate categorical data columns.  By default, the chi-square test will assume that proportions are equal across all the categories.  
+
+Let's test the hypothesis that favorability ratings are evenly distributed for C-3PO.
+
+$H_0:$ Favorability ratings are distributed evenly across all responses  
+
+$H_a:$ Favorability ratings are not distributed evenly across all responses
+
+```{r}
+c3po_table <- table(sw$`Favorability_C-3P0`)
+
+chi_3po <- chisq.test(c3po_table)
+chi_3po
+
+```
+
+Because the P-value is less than $\alpha=0.05$ we reject the null hypothesis.  We have sufficient evidence to suggest that favorability of C-3PO is not the same across categories.  
+
+## Digging Deeper
+
+When there is a statistically significant P-value we can dig into the calculations of the Chi-square test statistic to see which groups contributed most to statistical significance.  
+
+Comparing the observed frequencies of each groups to the expected counts can help us track down which groups contribute most to statistical significance.  
+
+We can extract that observed and expected counts from our chi-squared output as follows:  
+
+```{r}
+
+chi_3po$observed
+
+chi_3po$expected
+
+```
+
+Notice that all the expected counts are the same (137.8333).  There were a total of 827 respondents to the question about favorability of C-3P0 and 6 possible responses.  If $H_0$ were true and all categories were equally likely, you would expect to see $827/6=137.8333$ respondents in each category.    
+
+Recall that the Chi-Square test statistic is  
+
+χ² = Σ [(Observed - Expected)² / Expected]  
+
+and that a residual is observed - expected value.  To get a sense for which categories were most different than expected, we can look at the residuals: 
+
+```{r}
+
+chi_3po$residuals
+
+```
+
+Notice that the residual for Very Favorably is 28.6337.  This means that we observed 28.634 MORE people than we would have expected if the null hypothesis were true.  That is the largest contributor to the significance of the chi-square test statsitic.  
+
+
+# $\chi^2$ test of Independence
+
+We can examine the relationship between two *categorical* variables using $\chi^2$ test statistic.  
+
+## Degrees of Freedom
+
+Like the F-distribution, the $\chi^2$ distribution is right skewed and always positive.  It also has degrees of freedom that determine its shape.  The degrees of freedom for a $\chi^2$ distribution are related to how many levels of each categorical variable and is defined as follows:  
+
+$$df = (r-1)(c-1)$$  
+
+Where $r$ is the number of rows and $c$ is the number of columns in a summary table.  
+
+As with other distributions, the degrees of freedom determine the shape of the distribution and help us calculate the correct p-value for a statistical test.  
+
+## Hypothesis Test
+
+The null and alternative hypotheses test for $\chi^2$ test for independence are always the same.
+
+$$H_0: \text{The row variable is independent of the column variable}$$  
+
+$$H_A: \text{The row variable is not independent of the column variable}$$  
+# Even though we change the row and column here, the chi value would be still the same because mathmatically, the value is still the same. However, in real life, if you swap the response variable and explanatory variable, it will have different meanings.1
+
+While not a fan of the double negative, it serves a technical purpose. Mathematically, we get the same test statistic and p-value if we swap rows and columns.  We cannot say the row variable depends on the column variable without also saying that the column variable depends on the row variable.  
+
+Think of Alice at the Mad Hatter's tea party:
+
+> “Then you should say what you mean," the March Hare went on.
+> "I do," Alice hastily replied; "at least-at least I mean what I say-that's the same thing, you know."
+>
+>"Not the same thing a bit!" said the Hatter. "Why, you might just as well say that 'I see what I eat' is the same thing as 'I eat what I see'!"
+>
+>"You might just as well say," added the March Hare, "that 'I like what I get' is the same thing as 'I get what I like'!"
+>
+>"You might just as well say," added the Dormouse, which seemed to be talking in its sleep, "that 'I breathe when I sleep' is the same thing as 'I sleep when I breathe'!"
+>
+>"It is the same thing with you." said the Hatter,”
+
+So we are resigned to conclude that we have sufficient/insufficient evidence that they are __not independent__.  
+
+# Tests for Independence in R
+
+The R code for $\chi^2$ tests for independence is simple, especially when we have raw data.  We can easily create a table using the `table_name <- table(col1, col2)` function, then insert `table_name` into the `chisq.test(table_name)` function.  
+
+```{r}
+
+chiropractic <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/chiropractic_data.csv')
+
+head(chiropractic,15)
+
+unique(chiropractic$location)
+
+unique(chiropractic$motivation)
+
+glimpse(chiropractic)
+```
+
+In this dataset, we have a column with "location" indicating the region of the respondents, and the motivation for visiting a chiropractor.  Our null and alternative hypotheses are:
+
+$$H_0: \text{Why you go to a chirpractor is independent of where you live}$$
+$$H_a: \text{Why you go to a chirpractor is not independent of where you live}$$
+ho: why you go to a chirpractor is independent of where you live.
+
+```{r}
+
+chiro_table <- table(chiropractic$location, chiropractic$motivation)
+chiro_table
+chiro_table_sum <- addmargins(table(chiropractic$location, chiropractic$motivation))
+
+
+
+chisq.test(chiro_table) # It gets the chi square test info 
+chisq.test(chiro_table)$expected  # It gets the 
+
+chisq.test(chiro_table_sum)$expected
+
+```
+
+We have sufficient evidence to conclude that why you go to the chiropractor is not independent of where you live. 
+
+## Test Requirements
+
+For a $\chi^2$ test of independence we need to check the expected counts for all the different combinations.  
+
+We don't need to fret about the math behind the expected count calculation.  Intuitively, if there was no relationship between the two variables you would expect all the row totals to be proportionally distributed across the column groups.  
+
+We only need to check that all expected counts are greater than __5__.
+
+```{r}
+chisq.test(chiro_table) # Check for the p-value
+
+chisq.test(chiro_table)$expected >= 5 # check if the expected values > 5
+# Q: How did the program gets the expected values?
+# A: ?
+
+# 5 is just a number. It just checks if we have enough data
+
+```
+
+## Visualization
+
+We can use `ggplot()` to create nice bar charts to help interpret the results.
+
+```{r}
+
+
+ggplot(chiropractic, aes(x = location, fill = motivation)) +
+  geom_bar(position = "dodge") +
+  theme_minimal()
+
+
+```
+
+# Your Turn
+
+## Grades and Classroom Type
+
+Use the data below containing counts of grades and classroom types to answer the questions below.  
+
+Create a Bar Chart using ggplot().
+
+```{r}
+
+course <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/course_type_by_grade.csv')
+glimpse(course)
+table(course)
+
+```
+
+Create a Bar Chart using ggplot()
+
+```{r}
+ggplot(course, aes(x = Grade, fill = Course_Type)) +
+  geom_bar(position = "dodge") + 
+  theme_minimal()
+
+ggplot(course, aes(x = Course_Type, fill = Grade)) +
+  geom_bar(position = "dodge") + 
+  theme_minimal()
+```
+
+
+Perform the $\chi^2$ test of independence.  
+
+```{r}
+chisq.test(table(course$Grade, course$Course_Type))
+
+chisq.test(table(course$Grade, course$Course_Type))$expected
+chisq.test(table(course$Grade, course$Course_Type))$expected >= 5
+
+
+```
+
+
+__Question__:  Are the requirements for a $\chi^2$ test satisfied?  
+__Answer__:  Yes!
+
+__Question__:  What are the null and alternative hypotheses?
+__Answer__: 
+$$H_0: \text{Your grade is independent of your course type}$$
+$$H_a: \text{Your grade is not independent of your course type}$$
+
+__Question__:  What is the test statistic, $\chi^2$?
+__Answer__: 1.7707
+
+__Question__:  How many degrees of freedom does this test have?
+__Answer__: 4 
+
+__Question__:  What is the P-value?
+__Answer__: 0.7778
+
+

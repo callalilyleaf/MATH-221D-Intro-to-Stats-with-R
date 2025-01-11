@@ -1,0 +1,70 @@
+---
+title: Intro to Data Wrangling
+format:
+  html:
+    self_contained: true
+    embed_resources: true
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+<!---
+-->
+
+The 5 steps of conducting the data and study:
+| Step 1: | **D**aniel   | **D**esign the study   |
+| Step 2: | **C**an      | **C**ollect data       |
+| Step 3: | **D**iscern  | **D**escribe the data  |
+| Step 4: | **M**ore     | **M**ake inferences    |
+| Step 5: | **T**ruth    | **T**ake action        |
+
+-----------------------------------------------------------------
+Groups in the experiment:
+considered group: The group which has the key factor influence in it.
+control group: The group which don't have the key factor influence.
+
+-----------------------------------------------------------------
+Data Type: 
+Quantitative Data: The data can be measurable and mathematically operated. Ex. Age
+Categorical Data: The data can't be measured and mathematically operated. Ex. Birth Month
+
+-----------------------------------------------------------------
+Study Type:
+Observational Studies: The study that only observe, not controlling any factors and change the object artificially.
+Experiments: The study that you control several factors to have different results.
+
+-----------------------------------------------------------------
+Experiments objects:
+Experimental units or subjects: The objects(people/ items/ animals.etc) that receive the experiments. 
+                                Ex. The mouse which receive the test.
+Treatments: The key factor. Ex.The vaccine.
+Population: The whole population body which is relevant to the experimental units/ subjects.
+
+-----------------------------------------------------------------
+Sampling scheme:
+
+- simple random sample: Pick the samples randomly. I mean, randomly for real, like a blind pick.
+
+- stratified sample: Separate the data into groups by their traits(Ex. school year, sex, race...etc)
+
+- Systematic sample: Pick the sorted (or arrayed) data by the same difference value between each sample. 
+                     (Ex. The difference is 4. Then pick the 1st, 5th, 9th, 13th data from the dataset)
+- cluster/block sample: Separate the whole data set into chunks/blocks , then When the variation from one block to another is relatively low, compared to the variation within the block.
+
+-----------------------------------------------------------------
+Short Keys: 
+Ctrl + Alt + i : Create a R language chuck 
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+

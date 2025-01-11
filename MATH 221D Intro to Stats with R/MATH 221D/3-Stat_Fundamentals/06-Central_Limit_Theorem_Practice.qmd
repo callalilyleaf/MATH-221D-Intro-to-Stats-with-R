@@ -1,0 +1,51 @@
+---
+title: CLT Practice
+subtitle: Practice Problems
+format:
+  html:
+    self_contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Instructions
+
+Answer the following questions, render the document and submit the `.html` report.
+
+# Questions
+
+Suppose you take a sample of size $n=5$ from a right skewed distribution with a population mean, $\mu=125$ and a standard deviation, $\sigma=12$
+
+```{r}
+x <- 125/sqrt(5)
+x
+
+## 
+
+```
+
+
+__Question__: What is the mean of the distribution of sample means ($\mu_{\bar{x}}$)?  
+__Answer__: 125
+
+__Question__: What is the standard deviation of sample means ($\sigma_{\bar{x}}$)?  
+__Answer__: 55.9017
+
+__Question__:  What is the *shape* of the distribution of sample means and why?  
+__Answer__:right skewed, since the sample size isn't big enough (5 < 30)
+
+
+Now suppose you increase the sample size to $n=100$.  What is:
+
+__Mean of sample means__: 125 
+__Standard deviation of sample means__:  12/sqrt(100) = 1.2
+__Shape of the distribution of sample means__:  Symmetric (When the sample amount is more than 30, the distribution becomes the normal distribution aka symmertric distribution)
+
+
+Describe the difference between the Law of Large Numbers and the Central Limit Theorem.  
+__Answer__:  The Law of Large Numbers indicates as the sample numbers n goes higher, the mean of picked samples (x-bar) will be closer to the mean of all samples from the distribution. On the other hand, the Central Limit Theorem shows if the number of samples is large enough(n >= 30), the sampling distribution will be approximately to normal distribution. So, LLN is talking about the mean of sampling data will be closer to the distribution mean(u), the CLT is mentioning about the sampling distribution will be closer to normal distribution as the number of samples are large enough (usually >= 30).

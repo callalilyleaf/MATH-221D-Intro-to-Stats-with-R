@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01b\\demo-01b.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01b\\demo-01b.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01b\\demo-01b.csproj",
+        "projectName": "demo-01b",
+        "projectPath": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01b\\demo-01b.csproj",
+        "packagesPath": "C:\\Users\\calla\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01b\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\calla\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

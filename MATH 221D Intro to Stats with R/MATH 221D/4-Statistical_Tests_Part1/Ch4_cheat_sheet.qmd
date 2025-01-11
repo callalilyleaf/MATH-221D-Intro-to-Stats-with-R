@@ -1,0 +1,32 @@
+---
+title: Ch4 Statistical Test Part 1 Cheat Sheet
+format:
+  html:
+    self_contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+
+-- P-value, alpha, type 1 error, and type 2 error --
+Q: Which one is false positive, which one is false negative?
+
+
+--Independent or Dependent sample test?
+
+--Residuals: The numbers that each data value - mean.
+Ex.
+    Lot   Viscosity  group_mean  residual
+   <chr>     <dbl>      <dbl>    <dbl>
+ 1 A          29.4       29.7   -0.262
+ 2 A          31.5       29.7    1.86 
+ 3 A          30.9       29.7    1.23 
+ 4 A          27.6       29.7   -2.02 
+ 5 A          28.8       29.7   -0.802
+ 6 B          30.6       30.4    0.200
+ 7 B          32.1       30.4    1.67 
+ 8 B          30.1       30.4   -0.320
+ 9 B          29.6       30.4   -0.800
+10 B          29.7       30.4   -0.75 
+
+Then, the point is to identify if the residuals are normally distributed. (qqPlot, and max/min < 2 test)

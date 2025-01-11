@@ -1,0 +1,360 @@
+---
+title: Simple Linear Regression
+format:
+  html:
+    self_contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Review
+
+Consider the relationship between Score on a math exam and a student's self-reported Confidence Rating.
+
+
+```{r}
+
+library(tidyverse)
+library(mosaic)
+library(rio)
+library(car)
+
+math <- import('https://byuistats.github.io/BYUI_M221_Book/Data/MathSelfEfficacy.xlsx')
+glimpse(math)
+```
+
+__Question__: What is the explanatory (aka independent) variable, $x$?  
+__Answer__:  Confidence Rating Mean
+
+__Question__: What is the response (aka the dependent) variable, $y$?  
+__Answer__:  Score
+
+
+Plot the relationship:
+
+```{r}
+
+boxplot(math$ConfidenceRatingMean)
+favstats(math$ConfidenceRatingMean)
+
+plot(Score ~ ConfidenceRatingMean, data = math)
+
+ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Student Confidence Rating in Math and Test Score"
+  ) 
+```
+
+__Question__:  Does the relationship appear linear?  
+__Answer__:  Yes
+
+__Question__: What is the direction of the relationship?
+__Answer__:  Positive
+
+__Question__: What do you think is the strength of the relationship?  (Strong/Moderate/Weak)
+__Answer__:  Strong
+
+__Question__: What is the correlation coefficient, r?
+__Answer__:  0.7278648
+
+```{r}
+
+cor(Score ~ ConfidenceRatingMean, data = math)
+
+```
+
+
+# Linear Regression Equation
+
+Recall that the correlation coefficient, $r$, tells us something about the direction and strength of a __linear__ relationship.
+
+
+Linear Regression allows us to find a functional relationship between X and Y:    
+
+$$y = \beta_0 + \beta_1x_1 +\epsilon$$
+
+This is a reframing of the familiar $y=mx+b$ but we change the intercept and the slope to be Greek letters signifying *population parameters*.  We also add a very important term, $\epsilon$, which signifies the "error" around the line.  Our estimate of error, $\epsilon$, will be critical to assessing the usefulness of our model.
+
+We can estimate the slope and intercept of the line that "best fits" the data and use that line to make predictions.  
+
+__NOTE__:  As before, Greek letters signify population parameters in statistics while Latin letters are often used for sample statistics.  We estimate $\beta_0$ and $\beta_1$ with $b_0$ and $b_1$ respectively. This leads to an equation for predicted values:  
+
+# Since there's only one data point in the sample, the equation won't have "error". That's why epsilon is not included in this formula.
+
+$$\hat{y}=b_0+b_1x_1$$
+where $\hat{y}$ signifies a predicted value for $y$ for a given $x$.
+
+# In R
+
+Recall that when we had a quantitative response variable and a categorical explanatory variable we could use the `t.test()` if the categorical variable had 2 levels or the `aov()` function if the categorical variable had multiple levels.  We used the same notation for both:  
+<br>
+`t.test(y ~ x, data = dat)` and
+`aov(y ~ x, data = dat)`
+<br>
+
+The `aov()` function output wasn't as useful as the `t.test()` by itself, so we typically assigned a name to the `aov()` output then used `summary()` to get the test statistic and p-value.  We could also extract "residuals".
+
+The same paradigm works for estimating the linear relationship between 2 quantitative variables, but we need to introduce a new function:  `lm()`.  The 'lm' stands for "linear model".  The relationship notation remains the same:  
+<br>
+`lm(y ~ x, data = dat)`
+<br>
+
+except $x$ and $y$ are both quantitative.  Just like with `aov()` the `lm()` output by itself doesn't give us test statistics and p-values.  We will also use the `summary()` function to get our test statistics.  
+
+Let's fit a linear model estimating the slope and intercept of the line that best fits the relationship between Confidence Rating and Test Score:
+
+```{r}
+
+math_lm <- lm(Score ~ ConfidenceRatingMean, data = math) # lm stands for "linear model"
+summary(math_lm) # Get estimated slope (ConfidenceRatingMean) and its p-value
+
+confint(math_lm, level = .92)
+# Q: Does this mean the alpha value is 0.04 so It gets the value from 0.88~0.96? or 0.92~0.96?
+
+qqPlot(math_lm$residuals) # examine for normal distribution
+
+plot(math_lm, which = 1) # examine if the difference between dots and regression line are equally separated
+
+sds = favstats(math_lm)$sd # examine the ratio of biggest sd and smallest sd.
+max(sds) / min(sds)
+
+18.69 + 12.695 * 5
+
+
+```
+
+The `lm()` output includes only the slope and the intercept. 
+
+!! Conclusion: Since the p-value of our ConfidenceRatingMean value is lower than alpha value, I have sufficient evidence to suggest that there's a linear relationship between the math exam score and student confidence report value.
+
+__Question__:  How do we interpret the intercept of 18.69?  
+__Answer__:  On average, if a student's Confidence Rating Value is 0, the math score of the student is 18.69 (When x = 0)
+
+__Question__:  How do we interpret the slope of 12.69 in context?  
+__Answer__:  As the Confidence Rating value goes up 1 unit, the value of math score goes up 12.69
+
+__Question__:  What is the expected score on a test of someone who ranks themselves 5 in confidence?  
+__Answer__:  82.165
+
+## 92% Confience statement: From every unit of confidencemean, on average, the test score will go up between 10.89262 and 14.49703
+
+## Plotting the Regression Line
+
+### Base R
+
+Scatter plots by themselves are nice, but we would also like to see the regression line.  Simple graphics in R can be augmented by using some functions.  The `abline()` function in base R, when executed right after a graphing function can add lines.  We've used this to add vertical lines and horizontal line already in class.  We can also use this function to add a regression line.  We simply insert our linear model output into the `abline()` function as follows:
+
+```{r}
+# Don't care about this
+plot(Score ~ ConfidenceRatingMean, data = math)
+abline(math_lm)
+```
+
+Just as with the other plotting functions we've used, we can change the color, type and width of the line:
+
+```{r}
+
+plot(Score ~ ConfidenceRatingMean, data = math, pch = 16, main = "Title")
+abline(math_lm, col = "purple", lwd = 3, lty = 3)
+
+
+```
+
+## GGPlot
+
+Using `ggplot()`, we can simply add a `geom_smooth()` geometry and specify the method of "smoothing" as a linear model:  
+
+```{r}
+ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Student Confidence Rating in Math and Test Score"
+  ) +
+  geom_smooth(method="lm") # This line gives you the linear regression equation.
+```
+
+By default, this gives us a confidence interval for the slope of the regression line.  We can turn that off by forcing the "standard error" to be `FALSE`:
+
+```{r}
+ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Student Confidence Rating in Math and Test Score"
+  ) +
+  geom_smooth(method="lm", se = FALSE) # Turn off the confidence interval for the slope of the regression line
+```
+
+## Hypothesis Testing for Regression
+
+A linear equation has 2 parameters: Slope and Intercept.  In most situations, the intercept isn't very interesting by itself and is often absurd. We arwe most often only interested in the slope
+
+$$H_o: \beta_1 = 0$$
+$$H_a: \beta_1 \neq 0$$
+
+These are the same for all simple linear regression questions.  
+
+To get the p-value and test statistics, we use the `summary()` function as we did with aov:
+
+```{r}
+summary(math_lm)
+```
+
+
+We can also calculate confidence intervals for the slope by using the `confint()` function.  This function requires you to tell it which model to extract a confidence intervals from.  You can specify which parameter you're interested in, and the level of confidence:  
+
+```{r}
+# input the model into the following function:
+confint(math_lm, level = .95)
+```
+
+
+How do we interpret this confidence interval for a slope?
+
+Technically correct:  95% Confident that the true population slope is within (10.674297, 14.71535)
+
+Contextual Explanation:  For every 1 unit increase in Confidence Rating, test scores go up by between (10.674297, 14.71535) on average.  
+
+## Regression Requirements (Is our P-value sus?)
+
+There are certain requirements for all statistical tests to be valid.  For means, we needed to make sure that the Central Limit Theorem applied.  This meant that we had a large enough sample size (N>30) or that the population itself was normally distributed.  
+
+For ANOVA, we had to check that the residuals were normally distributed and that the population standard deviations were the same.
+
+Regression analysis has 5 requirements to be valid.  While this sounds daunting, in practice we can check most of them very quickly. 
+
+1. Relationship between X and Y is Linear
+2. The residuals, $\epsilon$, are normally distributed
+3. The Variance of the error terms is constant for all values of X
+4. The X’s are fixed and measured without error (i.e. X’s can be considered as known constants)
+5. The observations are independent
+
+1. The linear relationship is assessed visually with the scatter plot.  If there is obvious curvature or non-linearity then fitting a line isn't the best model.
+->ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Student Confidence Rating in Math and Test Score"
+  ) +
+  geom_smooth(method="lm")
+
+2. We check the normality of the residuals with a `qqPlot()` exactly as with the `aov()` output.
+-> qqPlot(math_lm$residuals)
+
+3. Recall that with ANOVA, we had to check that the variation in each group was roughly the same (largest standard deviation was less than twice as large as the smallest standard deviation).  For a quantitative explanatory variable, we can't calculate the standard deviation for a specified level of $x$ because $x$ can be any number.  
+
+Constant variance in regression is checked with a new plot that looks at how the predicted values relate to the residuals.  This is important because we want our predictions to be "wrong" about the same regardless of the value of the prediction.  We're looking for random scatter.
+-> plot(math_lm, which = 1)
+
+4. Requirement 4 cannot be analyzed directly.  It is important because because $x$ is the independent variable.  If there is uncertainty about the input, then the simple linear regression might not be the most appropriate model.
+
+5. Requirement 5 also cannot be analyzed, but random sampling usually satisfies this requirement.  
+
+```{r}
+
+# Requirement 1:  Check for linear relationship
+ggplot(math, aes(x=ConfidenceRatingMean, y = Score)) + 
+  geom_point()
+
+# Req 2: Normality of residuals:
+qqPlot(math_lm$residuals)
+
+# Req 3: Constant variance (look odd patterns). When you put lm() output into the plot function it gives you several different plots. The residual plots we're most interested in are 1 and 2
+plot(math_lm, which = 1)
+
+```
+
+# Your Turn
+
+Let's loot at the relationship between Alcohol Consumption compared to life expectancy for selected countries.  
+
+
+```{r}
+alcohol <- import('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/life_expectancy_vs_alcohol_consumption.csv')
+glimpse(alcohol)
+```
+
+__Question__:  What is the repsponse variable?  
+__Answer__:  Life Expectancy
+
+__Question__:  What is the explanatory variable?  
+__Answer__:  Alcohol Consumed
+
+
+Make a presentation-worthy scatterplot using `ggplot()` including a regression line:
+
+```{r}
+ggplot(alcohol, aes(x = `Alcohol Consumed` , y = `Life Expectancy`)) +
+  geom_point(color = "darkblue") +
+  theme_bw() +
+  labs(
+    title = "Relationship between Alcohol Consumption and Life Expectancy"
+  ) +
+  geom_smooth(method="lm")  
+
+```
+
+
+__Question__:  Describe in words the nature of the relationship between the 2 variables (direction/strength/linearity)
+__Answer__:  When the alcohol consumption increase, the life expectancy decrease. The level of alcohol consumption has intermediate influence to life expectancy. The linear relationship between life expectancy and alcohol consumption is strong.
+
+Calculate the correlation coefficient:
+
+```{r}
+cor(alcohol$`Life Expectancy` ~ alcohol$`Alcohol Consumed`)
+
+```
+
+__Question__:  What is the the correlation coefficient, $r$?  
+__Answer__:  -0.5881589
+
+Perform a linear regression analysis for the relationship between alcohol consumption and life expectancy. 
+
+```{r}
+
+# Save your linear model:  
+alcohol_lm <- lm(alcohol$`Life Expectancy` ~ alcohol$`Alcohol Consumed`)
+summary(alcohol_lm)
+
+# Check for constant variance:  
+plot(alcohol_lm, which=1)
+
+# Check the normality of the residuals  
+qqPlot(alcohol_lm$residuals)
+
+confint(alcohol_lm, conf.level = 0.95)
+
+```
+
+
+__Question__:  What is the slope of the regression line?  
+__Answer__:  -2.786
+
+__Question__:  Interpret the slope of the regression line in context of the problem:  
+__Answer__:  When the alcohol consumption increase 1 unit, the life expectancy decrease 2.786
+For every unit of alcohol consumption increases, the life expectancy decrease 2.786 years on average.
+
+__Question__:  What is the intercept of the regression line?  
+__Answer__:  73.851
+
+__Question__:  Interpret the intercept of the regression line in context of the problem:  
+__Answer__:  If the alcohol consumption = 0, on average, the life expectancy equals to 73.851 years.
+
+
+__Question__:  What do you conclude about the slope of the regression line?    
+__Answer__:  I have sufficient evidence to suggest that when the alcohol consumption increases, the life expectancy decreases.
+
+__Question__:  What is the confidence interval for the slope? 
+__Answer__: (-4.683409, -0.8890535)
+
+__Question__:  Give a 1-sentence interpretation of the confidence interval in context of your research question:  
+__Answer__:  I'm 95% confident to suggest that for each unit increase in alcohol consumption, the life expectancy decrease between (-4.683409, -0.8890535) on average.
+

@@ -1,0 +1,10 @@
+"0",""
+"0","library(tidyverse)"
+"0","library(mosaic)"
+"0","library(rio)"
+"0","library(car)"
+"0",""
+"0","math <- import('https://byuistats.github.io/BYUI_M221_Book/Data/MathSelfEfficacy.xlsx')"
+"2","Error in curl::curl_fetch_memory(file) : 
+  Timeout was reached: [byuistats.github.io] SSL/TLS connection timeout
+"

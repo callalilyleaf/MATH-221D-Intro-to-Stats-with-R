@@ -1,0 +1,64 @@
+---
+title: Intro to Probability (Reading)
+format:
+  html:
+    self_contained: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Central Limit Theorem:
+The distribution of sample mean, x-bar, is approximately normal with the 
+1. ux-bar = u(Population Mean)
+2. Standard Deviation = sigma / sqrt(n)
+
+
+
+Large Number Theorem:
+
+
+```{r}
+
+xbar <- 13.5
+mu <- 20
+sigma <- 15
+n <- 33
+sigma_xbar <- sigma / sqrt(n)
+
+z <- (xbar - mu) / (sigma_xbar)
+z
+
+# Left tail [Prob(some sample mean LESS THAN xbar)]
+pnorm(z)
+
+# Right tail [Prob(some sample mean GREATER THAN xbar)]
+1-pnorm(z)
+
+# The probability of a sample mean being between A and B
+
+A <- 9
+B <- 15
+pnorm(B, mu, sigma_xbar) - pnorm(A, mu, sigma_xbar)
+
+# Calculating Percentiles: What is the sample mean below which a certain percent is found? 
+
+qnorm(.25, mu, sigma_xbar)
+```
+
+
+
+```{r}
+# qnorm()
+# for a normal distribution with mean, mu, and standard deviation, stdev, we can find a percentile using the following code:
+
+mu <- 100
+stdev <- 11
+percentile <- 0.9999 # !!  The percentile should be a number between 0 and 1
+
+qnorm(percentile, mu, stdev)
+
+```
+
+
+

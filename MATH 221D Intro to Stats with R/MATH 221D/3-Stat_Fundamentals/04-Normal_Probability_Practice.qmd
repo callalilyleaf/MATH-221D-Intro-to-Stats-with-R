@@ -1,0 +1,172 @@
+---
+title: Normal Probability Practice
+format:
+  html:
+    self_contained: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# The Normal Distribution
+
+Recall that the normal distribution is a probability distribution defined by its center ($\mu$) and its spread ($\sigma$).  
+
+
+# Normal Probability Calculator
+
+The code below can serve as a template for any calculations involving the normal distribution.  Feel free to copy and paste this into the subsequent code chunks.  
+
+__NOTE__:  R saves any objects that are named.  This means that if you run `mu <- 12`, R keeps track of `mu` until you change it.  When doing multiple problems that all use `mu`, be sure to run the whole code chunk, which will overwrite the names from previous examples.  
+
+```{r}
+
+# Value
+x <- 5
+
+# Population Mean
+mu <- 10
+
+# Population Standard deviation
+sigma <- 1 
+
+# Z-score:  number of standard deviations above the mean
+z <- (x-mu) / sigma
+z
+
+
+# Probability of observing a z-score LESS THAN the one we observed (left tail)
+pnorm(z)
+
+# Probability of observing a z-score GREATER THAN the one we observed (Right Tail)
+1-pnorm(z)
+
+
+# For calculating the area between 2 numbers
+A <- 6 
+B <- 4
+pnorm(B, mu, sigma) - pnorm(A, mu, sigma)
+
+# Find the X_bar associated with a spceific percentile
+# Mean = mu = X-bar
+qnorm(.25, mu, sigma)
+
+```
+
+
+## Brisket Competition
+
+Competition was tight at a Saint Louis BBQ competition.  Brisket scores were normally distributed with an average score of 5.941 with a standard deviation of 0.04.  
+
+```{r}
+mu = 5.941
+sd = 0.04
+
+# Find the z-score of data greater than 6, then use pnorm to find the probability of greater than 6
+z6 <- (6 - mu) / sd
+z6
+
+1 - pnorm(z6) #pnorm is the probability less than 6. So, 1-pnorm == the probability greater than 6
+
+##
+
+z4 <- (4 - mu) / sd
+z4
+
+pnorm(z4)
+
+##
+qnorm(.99, mu, sd)
+```
+
+__Question__: What's the probability of getting a score GREATER than 6?  
+__Answer__: 7.010627% 
+
+
+__Question__: What's the probability of getting a score LESS than 4?  
+__Answer__:  0%
+
+__Question__:  What is the 99th percentile of this Brisket Competition?  
+__Answer__:  6.034054
+
+
+## Prbability of a "False Start"
+
+“At high level meets, the time between the gun and first kick against the starting block is measured electronically, via sensors built in the gun and the blocks. A reaction time less than 0.1 s is considered a false start. The 0.2-second interval accounts for the sum of the time it takes for the sound of the starter's pistol to reach the runners' ears, and the time they take to react to it.” (https://en.wikipedia.org/wiki/100_metres) 
+Let's suppose that reaction times are normally distributed with a mean of 0.2 seconds and a standard deviation of 0.03.  
+
+What's the probability of a false start? (meaning a reaction time LESS than 0.1)
+A: 0.04290603%
+
+```{r}
+mu = 0.2
+sd = 0.03
+
+falsez = (0.1 - mu)/sd
+falsez
+
+pnorm(falsez)
+
+```
+
+
+# Law School Admissions Test (LSAT)
+
+The scores on the LSAT are approximately normal with mean of 150.7 and standard deviation of 10.2. (Source: www.lsat.org.) Queen's School of Business in Kingston, Ontario requires a minimum LSAT score of 157 for admission.
+
+```{r}
+mu = 150.7
+sd = 10.2
+
+z <- (157-mu)/sd
+z
+
+1 - pnorm(z)
+##
+
+A <- 155
+B <- 170
+pnorm((170-mu)/sd) - pnorm((155-mu)/sd) 
+
+##
+qnorm(0.974, mu, sd)
+
+```
+
+__Question__:  What is the z-score for a score of 157?  
+__Answer__:0.6176471  
+
+
+__Question__: What is the probability that a randomly selected person who took the LSAT would score above 157?  
+__Answer__: 26.8404% 
+
+
+__Question__:  What is the probability that a randomly selected test taker will have a score between 155 and 170?  
+__Answer__:  30.74349%
+
+
+__Question__:  What is the 97.4th percentile of LSAT scores?  
+__Answer__:  170.52
+
+
+
+```{r}
+mu = 168.48
+sd = 6.86
+
+z = (180 - mu) / sd
+
+1 - pnorm(z)
+
+## X-bar is the sample mean, u = population mean
+## Latin for sample, greek for population
+
+```
+
+
+
+

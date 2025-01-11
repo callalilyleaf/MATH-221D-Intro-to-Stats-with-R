@@ -1,0 +1,5 @@
+"0","image <- readPNG(url(""https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEp2A_l2XGVWDGnfBpe_4bZ2OmKFTH6zJo0g&s""))
+"
+"2","Error in readPNG(url(""https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEp2A_l2XGVWDGnfBpe_4bZ2OmKFTH6zJo0g&s"")) : 
+  could not find function ""readPNG""
+"

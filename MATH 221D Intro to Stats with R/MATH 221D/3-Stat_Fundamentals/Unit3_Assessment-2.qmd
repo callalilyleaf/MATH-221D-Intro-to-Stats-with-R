@@ -1,0 +1,297 @@
+---
+title: "Unit 3 Assessment"
+author: "Ivan Cheng"
+format:
+  html:
+    self-contained: true
+    embed-resources: true
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+Don't forget to Load the Libraries:  
+
+```{r, echo=FALSE, include=FALSE}
+# Load the Libraries
+library(rio)
+library(mosaic)
+library(tidyverse)
+library(car)
+```
+
+# The Crooked Casino
+
+A typical roulette wheel has 38 spaces (18 red spaces, 18 black, and 2 green). This particular casino has rigged the game so the probabilities are off.  (What do you expect from a casino!)  
+
+The following table shows the probabilities for each color on the rigged roulette wheel.  Use the table information to answer the following questions.  (Run the code chunk to see it better)
+
+```{r}
+knitr::kable(tibble(' '="Probability", Red=.48, Black=.49, Green='???'))
+```
+
+1) __QUESTION__: What is the probability of getting a green on the crooked wheel?  
+__ANSWER__:  0.03
+
+2) __QUESTION__:  Are you more or less likely to get a green on the crooked or a fair wheel?  
+__ANSWER__:  Less
+
+# Reasoning About the Mean
+
+A bank manager keeps a record of the salaries of all her employees.  One day, looking over the salaries, she noticed that John's monthly salary was recorded as having an extra zero.  It was supposed to be recorded as \$5600 but was incorrectly recorded as \$56,000. The average monthly salary of employees in this bank is \$5900 with a standard deviation of \$524. 
+
+```{r}
+
+```
+
+3) __QUESTION__: How would correcting the error of John's salary influence the mean?  
+__ANSWER__:  The correct mean will be less than 5900
+
+4) __QUESTION__:  How would it influence the standard deviation?  
+__ANSWER__:  The standard deviation will be less than 524
+
+# Data Types
+
+Indicate whether each of the following variables are quantitative or categorical:
+
+5) __QUESTION__:  A company's profit in dollars each day:  
+__ANSWER__:  quantitative
+  
+6) __QUESTION__:  Whether or not a problem occurred in a day:  
+__ANSWER__:  categorical
+
+7) __QUESTION__:  The shift of workers at a factory (day or night shift):  
+__ANSWER__:  categorical
+  
+8) __QUESTION__:  Miles driven since last oil change:  
+__ANSWER__:  quantitative
+
+# Interpreting Boxplots
+
+Students in introductory statistics were presented with a page containing 30 colored rectangles. Their task was to name the colors as quickly as possible. Their times (in seconds) were recorded and categorized by gender.  The boxplot of the times it took each gender to name all the colors are graphed below.
+
+![](https://github.com/byuistats/Math221D_Course/raw/main/Images/BoxPlots%20E1_V4-1.png) 
+
+9) __QUESTION__:  What is the approximate median time it took males to name all the colors?  
+__ANSWER__:  22 seconds
+
+10) __QUESTION__:  For the females, approximately what percent of them answered in less than 20 seconds?  
+__ANSWER__:  75%
+
+# COVID-19 in NYC
+
+A health science researcher from New York City wanted to see if those that had a problem with obesity were generally more vulnerable to severe COVID-19. He divided the state of New York into two groups, those that had a BMI in the obese range and those who did not.  He then took a random sample of 50 people from each group and measured the number of COVID-19-related hospitalizations in each group.  
+
+11) __QUESTION__:  What is the population of the study?  
+__ANSWER__:  The people who have obesity
+  
+12) __QUESTION__:  What is the sample of the study?  
+__ANSWER__:  The 100 people randomly drawn from the 2 groups.
+  
+13) __QUESTION__:  Which sampling method was used in the study above?  
+__ANSWER__:  Simple Random Sampling
+  
+14) __QUESTION__:  Is this study an observational study or an experiment?  
+__ANSWER__:  observational study
+
+# Reasoning about the Normal Distribution
+
+In the graph below, two normal distributions are plotted, each with a different color. 
+![](https://github.com/byuistats/Math221D_Course/raw/main/Images/Normal_Curve_E1V4.png)
+
+15) __QUESTION__:  Which distribution appears to have the largest standard deviation, the dashed red line or the solid blue line?  
+__ANSWER__:  dashed read line
+
+16) __QUESTION__:  Estimate the standard deviation of the red curve. (HINT:  Think about how you would sketch out +/- 3 standard deviations)  
+__ANSWER__:  33
+
+# Tennis Serves
+
+During a tennis match, data were collected on the speed (in miles per hour) of the first and second serves. 
+**Create a table of summary statistics** (including means, standard 
+deviations, the 5 number summary and the sample size) for both serve types (First and Second).
+```{r, table_wi}
+tennis <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/TennisServes.csv')
+view(tennis$ServeSpeed_mph ~ tennis$ServeType)
+favstats(tennis$ServeSpeed_mph ~ tennis$ServeType)
+
+```
+
+17) __QUESTION__:  Which serve type is fastest based on the median?  
+__ANSWER__:  First Serve
+
+18) __QUESTION__:  Compare the mean and the median for the *first* serve.  What might this suggest about shape of the distribution of serve speeds of first serves?  
+__ANSWER__:  Left Skewed
+
+# Crossroads Purchases
+
+A sample survey was taken of purchases at the Crossroads.  Load the data into R:
+
+```{r}
+crossroads <- import('https://github.com/byuistats/Math221D_Cannon/raw/master/Data/CrossroadsPurchases.csv')
+view(crossroads)
+```
+
+**Create a histogram** of purchase amounts.
+
+```{r}
+histogram(crossroads$Amount)
+```
+
+**Create a QQPlot** of purchase amounts.  
+
+```{r}
+qqPlot(crossroads$Amount) # Be careful for the spelling: "qqPlot" Uppercased P!
+
+```
+
+
+**Create a table of summary statistics** (including means, standard deviations, the 5 number summary and the sample size) of purchase amounts for all the payment methods.
+
+```{r}
+favstats(crossroads$Amount)
+favstats(crossroads$Amount ~ crossroads$Method)
+
+```
+
+```{r}
+boxplot(crossroads$Amount ~ crossroads$Method)
+```
+
+
+19) __QUESTION__:  How would you describe the shape of the distribution based on the qqplot?  
+__ANSWER__:  Symmetric distribution, very close to normal distribution
+
+20) __QUESTION__:  Which purchase method has the lowest first quartile (25th percentile)?  
+__ANSWER__:  Cash
+
+21) __QUESTION__:  Which purchase method has the highest third quartile (75th percentile)?  
+__ANSWER__: Credit
+
+22) __QUESTION__:  What is the maximum purchase amount at the crossroads in this survey?  
+__ANSWER__:  10.45
+
+23) __QUESTION__:  Based on this sample, which payment method is the most frequently used?  
+__ANSWER__:    I-Card
+
+24) __QUESTION__:  The results that you provided in the prior four questions, are they parameters or statistics, and why?   
+__ANSWER__: statistics. Since they are the data collected by the observational study, without applying different factors in it
+# -> !Review this question later!
+
+
+
+# Climbing Gear
+
+![](https://github.com/byuistats/Math221D_Course/raw/main/Images/carabiner.png)
+Carabiners are used for rock climbing and many construction jobs that require being tied to an anchor. Those who use carabiners depend on their strength and safety. A certain regulatory agency in the USA requires that a carabiner is capable of withstanding 3,600 pounds in all directions.
+A factory that produces carabiners wants test what percent of their equipment meets the regulatory requirements.  Suppose the strength of the carabiners produced by the factory are normally distributed with average strength of 3,750 pounds and a standard deviation of 125 pounds.
+```{r}
+u = 3750
+sd = 125
+
+x_bar = 3600
+n = 1
+
+z = (x_bar - u) / sd / n
+z
+
+pnorm(z)
+
+qnorm(0.99, u, sd)
+```
+
+
+25) __QUESTION__:  what is z-score of a carabiner of having a strength of 3,600 pounds?  
+__ANSWER__: -1.2
+
+26) __QUESTION__:  How do you define the z-score of a carabiner of having a strength of 3,600 pounds?
+__ANSWER__:   It's 1.2 standard deviation less than the mean, which is 3,750 pounds
+
+27) __QUESTION__:  what is the probability that a randomly selected carabiner from their production line exceeds 3,600 pounds?    
+__ANSWER__: 0.1150697
+
+28) __QUESTION__:  What is the factory's 99th percentile of strength?  
+__ANSWER__: 4040.793 (pounds)
+
+29) __QUESTION__: What does it mean for a carabiner to have a strength at the 99th percentile?   
+__ANSWER__:   Its strength capability is higher than the 99 percent of the other carabiners in the production line
+
+30) __QUESTION__:  What could the manufacturer do to increase the percent of the equipment that meets regulatory requirements?   
+__ANSWER__:  Increase the strength of the carabiner by using another stronger material.
+  
+```{r, include=FALSE, echo=FALSE, eval=FALSE}
+# Calculator
+xbar <- 600
+mu <- 542.3
+sigma <- 120.54
+n <- 15
+sigma_xbar <- sigma / sqrt(n)
+sigma_xbar
+z <- (xbar - mu) / sigma_xbar
+z
+# Probability of a sample mean being less than our xbar:
+pnorm(z)
+# Prob. of a sample mean being higher than our xbar:
+1-pnorm(z)
+
+pnorm(600, 542.3, sigma_xbar) - pnorm(500, 542.3, sigma_xbar)
+
+
+# Percentiles
+percentile <- 
+qnorm(percentile, mu, sigma_xbar)
+```
+
+# GMAT
+
+The admissions committees for most masters of business administration (MBA) programs require the Graduate Management Admission Test (GMAT) as part of the application for new students. It has been shown that the scores on the GMAT are normally distributed with a mean of 542.3 and a standard deviation of 120.54. (Source: MBA.com) The minimum GMAT score required for admission to the MAcc program in the School of Accountancy at BYU is 500, but it is rare for students with scores less than 600 to be admitted. (Source: Marriot school of Business-BYU) 
+
+31) __QUESTION__:  What is the probability that a randomly selected student will score above 600 on the GMAT?  
+__ANSWER__:  0.3160834
+
+32) __QUESTION__:  What is the probability that a randomly selected student will score between 500 and 600 on the GMAT?  
+__ANSWER__:  0.3210927
+
+Now consider a sample of size **n=15** students who took the GMAT.  
+
+33) __QUESTION__:  What is the mean of the distribution of sample means?  
+__ANSWER__:  542.3
+
+34) __QUESTION__:  What is the standard deviation of the distribution of sample means?  
+__ANSWER__:  31.12329
+
+35) __QUESTION__:  What is the shape of the distribution of sample means?  
+__ANSWER__:  Normal Distribution
+
+36) __QUESTION__:  What is the probability that a sample mean will be between 500 and 600?  
+__ANSWER__:  0.8810687
+
+37) __QUESTION__:  Define what a distribution of sample means is.  
+__ANSWER__:  The distribution that is made of the sample means. In a more detailed way, each data in this distribution is the mean of certain samples.
+
+```{r, include=FALSE, echo=FALSE, eval=FALSE}
+# Calculator
+xbar <- 
+mu <- 
+sigma <- 
+n <- 
+sigma_xbar <- sigma / sqrt(n)
+sigma_xbar
+z <- (xbar - mu) / sigma_xbar
+z
+# Probability of a sample mean being less than our xbar:
+pnorm(z)
+# Prob. of a sample mean being higher than our xbar:
+1-pnorm(z)
+# Percentiles
+percentile <- 
+qnorm(percentile, mu, sigma_xbar)
+# Prob of being between A and B
+A <- 
+B <- 
+  
+pnorm(B, mu, sigma_xbar) - pnorm(A, mu, sigma_xbar)
+```

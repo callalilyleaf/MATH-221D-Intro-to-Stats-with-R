@@ -1,0 +1,6 @@
+```{r}
+#Boxplot usage
+
+boxplot(big5$Agreeableness ~ big5$`Sex(M/F)`, col=c(5,7), main="Agreeableness with Male and Female", xlab= "Sex", ylab="Agreeableness")
+```
+

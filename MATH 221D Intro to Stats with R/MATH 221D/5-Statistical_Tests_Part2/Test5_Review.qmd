@@ -1,0 +1,80 @@
+---
+title: "Test Review"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)
+```
+
+
+# Data Visualization
+
+  - Know how to create bar charts from raw data for 1 or 2 variables
+  - Know how to make a scatter plot with `ggplot()` that includes a regression line
+  - Know how to make side-by-side boxplots using `ggplot()`
+    * Know how to change color of the boxes based on a variable in the dataset
+  - Know how to add chart titles and improved axis labels
+  - Know how to make qqPlots for data or residuals (for ANOVA and Regression)
+
+# Regression
+
+  -	Know the difference between a dependent (or response or y) variable and an independent (or explanatory or x) variable
+  -	Know how to interpret r (correlation coefficient) 
+  -	Know the possible values of r
+  -	Know how to calculate r
+  -	Determine how to get a simple linear regression equation ($\hat{y}=b_0 + b_1 x$) from the regression output
+  -	Interpret the y-intercept ($b_0$) and slope ($b_1$) of a regression equation
+  -	Know what a residual is
+  -	Know the requirements to check for regression
+    * Linearity from a scatterplot
+    * Normality of Residuals (qqPlot)
+    * Constant Variance (patterns in residual by predicted value)
+  -	Know how to state the Null and Alternative Hypotheses for a Slope 
+  -	Know how to find the test Statistic for regression
+  -	Know how to get a P-Value
+  -	Know how to make a conclusion comparing P-value with  α
+  -	Know how to get a Confidence Interval for the slope
+  - Know how to interpret a confidence interval for a slope in context of the problem 
+
+
+# Chi Square Tests of Independence
+
+  - Create contingency table of counts for 2 variables
+  - Create a table of proportions
+    * Overall table proportions
+    * Row percents (margin = 1)
+    * Column percents (margin = 2)
+  - Know how to perform a Chi-square test of independence between 2 variables
+    * State the Null and Alternative Hypotheses
+    * State your conclusion in context of the problem
+  - Know how to check the requirments for a Chi-square test of independence (Expected counts all greater than 5)
+
+# Hypothesis Tests for Means
+
+  -	Know how to perform an analysis of variance
+  -	Check the correct requirements and what it means when the requirements are satisfied
+    * Equal variances
+    * Normality of residuals
+  -	Know how to state the Null and Alternative Hypotheses
+  -	Know how to find the Test Statistic, F
+  -	Know how to get a P-Value
+  -	Know how to make a Conclusion comparing P-value with $\alpha$
+
+
+# Which Test?
+
+The data types we have will determine what type of anlaysis is appropriate. 
+
+The first step is to determine what is the response variable and what is the explanatory variable.  
+
+Below are some charts that might help visualize which test to use. 
+
+![](https://github.com/byuistats/Math221D_Course/raw/main/Images/Which_Quantitiative_Analysis.png)
+
+
+
+![](https://github.com/byuistats/Math221D_Course/raw/main/Images/Which_Test_Matrix.png)
+__NOTE__:  The ANOVA quadrant might be a t-test if there are only 2 groups.  

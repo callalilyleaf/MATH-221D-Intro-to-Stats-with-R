@@ -1,0 +1,166 @@
+---
+title: Who consider online dating is more successful, Guys or Girls?
+author: Ivan Cheng
+format:
+  html:
+    self-contained: true
+    embed-resources: true
+---
+## Start from: Create concrete steps to follow for each phase of the project and do it!
+
+# Introduction
+  "Which gender consider online dating would be more successful, actually?" Most of people would think female receive more attentions on the dating apps, however, is that true? Moreover, more attentions don't equal to more success on relationship. Thus, to remove the mystery of this question. I decided to design a research on the success among genders on online dating topic.
+
+# Design the Study
+  First of all, our final research question would be: "Compared to in-person relationship, which gender considers online dating is more successful? Male or Female?" Since we don't have the exact data for the users' real relational experiences, we can still take their opinion as an indicator. We will use the data collected by Pew Researching Center and mainly focus on US residents. Although most people might regard female could receive attentions more easily, however, more attentions don't equal to more successes. 
+  
+# Collect the Data
+  To the collect the data, I will research on 2 kinds of categorical variables: 
+  1. (Response Variable) The relationship starts from online dating is : More successful, Less successful,or Just as successful?
+  2. (Explanatory Variable) Is your partner a : Female,or Male?
+To simplify the research, we don't consider the LGBTQ sections in this research. I think that also why the original data set will use the orientation to define testers' gender. In this case, I will only focus on the people who answered straight for their sexual orientation and use their answers on partner sex to define their sex reversely.
+  Since I'm focusing on the categorical variables, I would use Chi-square test for independence and proportion table comparison to conduct the test.
+
+# Describe/Summarize the Data
+Notes for each column meaning and restriction
+
+ONSUCCESS_W56 (More successful, Less successful, Just as successful)
+PARTNERSEX_W56, 1 = female; 2 = male (Their partner sex 1 == male, thus the tester who chose 1 is female, 2 is male)
+filter: ORIENTATIONMOD_W56 == 2(straight, not LGBTQ), 
+
+```{r}
+library(tidyverse)
+library(mosaic)
+library(rio)
+library(ggplot2)
+library(car)
+
+# Be sure to make this using ggplot()
+
+# Session -> Set working directory ->To Source File location
+# Or: More -> Copy folder path to Clipboard
+data <- import("C:/Users/calla/桌面/programming/MATH 221D/MATH 221D/6-Semester_Project/ATP W56.sav")
+glimpse(data)
+
+dating <- data %>% 
+  filter(ORIENTATIONMOD_W56 == 2, # filter out the orientation isn't straight
+         ONSUCCESS_W56 %in% c(1, 2, 3), # filter out the NA and bad values
+         PARTNERSEX_W56 %in% c(1, 2)) %>%  # filter out the NA and bad values
+  select(ONSUCCESS_W56, PARTNERSEX_W56) # only select 2 columns for online dating successful opinion and partner sex(for later define testers' sex.)
+  
+  
+glimpse(dating)
+table(dating$ONSUCCESS_W56)
+table(dating$PARTNERSEX_W56)
+
+```
+
+
+```{r} 
+
+dating_mutate <- dating %>% # Change the column names for easier understanding
+  mutate(
+    on_date_success = case_when(
+      ONSUCCESS_W56 == 1 ~ "More successful",
+      ONSUCCESS_W56 == 2 ~ "Less successful",
+      ONSUCCESS_W56 == 3 ~ "Just as successful"
+    ),
+    sex = case_when(
+      PARTNERSEX_W56 == 1 ~ "female",
+      PARTNERSEX_W56 == 2 ~ "male"
+    )
+  )
+
+glimpse(dating_mutate)
+
+```
+
+
+# Make Inference
+
+Use addmargins() & prop.table() functions to have the propositions and percentages on levels of success of female/ male responses.
+```{r}
+# Perform the appropriate test for the data selected
+dating_table <- table(dating_mutate$on_date_success, dating_mutate$sex)
+dating_table
+
+addmargins(dating_table)
+
+prop.table(dating_table, margin = 1)
+prop.table(dating_table, margin = 2)
+
+```
+
+Create a bar graph to compare online dating successful difference on sex(based on proportions):
+
+```{r}
+# The bar chart based on proportions
+ggplot(dating_mutate, aes(x = on_date_success, fill = sex)) + 
+  geom_bar(position = "dodge") + 
+  labs(
+    title = "Male Regards Online Dating Is More Successful Than Female Does(proportions)"
+  ) +
+  theme_bw()
+  
+
+```
+
+Create a column graph to compare online dating successful difference on sex(based on percentages):
+```{r}
+# create a data set based on percentage first
+dating_prop <- as.data.frame(prop.table(dating_table, margin = 1))
+
+glimpse(dating_prop)
+view(dating_prop)
+
+# use mutate() to change column names
+names(dating_prop) <- c("on_date_success", "sex", "percentage")
+glimpse(dating_prop)
+
+
+# create the column chart based on percentages
+ggplot(dating_prop, aes(x = sex ,y = percentage, fill = on_date_success)) +
+  geom_col(position = "dodge") + 
+  labs(
+    title = "Male Regards Online Dating Is More Successful Than Female Does(percentages)"
+  ) +
+  theme_bw()
+
+```
+
+
+State Null Hypothesis and Alternative Hypothesis:
+
+$$H_0: \text{Your opinion on how successful online dating is is independent of your sex}$$
+$$H_a: \text{Your opinion on how successful online dating is is not independent of your sex}$$
+
+Conduct Chi-Square Test on prop.table
+```{r}
+chisq.test(dating_table)
+
+```
+P-value: 0.0009103, less than alpha value 0.05. 
+Thus, we reject the Null Hypothesis and receive the Alternative Hypothesis.
+
+Degree of freedom: 2
+----------------------
+
+Check if p-value is valid (if all of the counts are greater than 5)
+```{r}
+chisq.test(dating_table)$expected >= 5
+
+```
+validity examination: Passed.
+
+
+----------------------------
+# Conclusion (Take Action)
+
+Conclusion: I have sufficient evidence to suggest that your opinion on how successful online dating is is not independent of your sex.
+
+From the research, we can see more males consider online dating would be successful than female. Thus, go back to the beginning question: "Compared to in-person relationship, which gender considers online dating is more successful? Male or Female?" The answer is Male. 
+
+Actions: As we know that more males consider the online dating would be more successful than female, we should focus on male party when we talk about the disadvantages of online dating. Since males are more likely to have higher relationship success expectation on online dating, we should put more resources and assistance on male who had some issues and challenges on online dating topic.
+
+
+
