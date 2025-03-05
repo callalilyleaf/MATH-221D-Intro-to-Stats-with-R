@@ -1,7 +1,0 @@
-"0","library(tidyverse)"
-"0","library(mosaic)"
-"0","library(rio)"
-"0","library(ggplot2)"
-"0",""
-"0","sw <- read_csv('https://raw.githubusercontent.com/byuistats/Math221D_Cannon/master/Data/StarWarsData_clean.csv')"
-"0",""

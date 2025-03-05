@@ -1,6 +1,0 @@
-"0",""
-"0","extro <- big5 %>%"
-"0","  filter(Extroversion <= 100,"
-"0","         BirthMonth != ""Johnson"") %>%"
-"0","  select(Extroversion, BirthMonth)"
-"0","         "

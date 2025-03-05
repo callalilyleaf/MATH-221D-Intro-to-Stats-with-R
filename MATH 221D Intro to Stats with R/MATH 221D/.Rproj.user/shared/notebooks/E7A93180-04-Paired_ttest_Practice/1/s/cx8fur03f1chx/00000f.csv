@@ -1,7 +1,0 @@
-"0","library(tidyverse)"
-"0","library(mosaic)"
-"0","library(rio)"
-"0","library(car)"
-"0",""
-"0","helmet_fit <- import(""https://byuistats.github.io/M221R/Data/quiz/R/helmet_fit.csv"")"
-"0",""

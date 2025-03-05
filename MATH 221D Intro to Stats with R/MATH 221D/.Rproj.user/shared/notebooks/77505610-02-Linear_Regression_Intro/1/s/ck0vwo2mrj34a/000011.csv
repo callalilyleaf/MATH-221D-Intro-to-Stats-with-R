@@ -1,7 +1,0 @@
-"0",""
-"0","ggplot(math, aes(x = ConfidenceRatingMean, y = Score )) +"
-"0","  geom_point(color = ""darkblue"") +"
-"0","  theme_bw() +"
-"0","  labs("
-"0","    title = ""Relationship between Student Confidence Rating in Math and Test Score"""
-"0","  ) "

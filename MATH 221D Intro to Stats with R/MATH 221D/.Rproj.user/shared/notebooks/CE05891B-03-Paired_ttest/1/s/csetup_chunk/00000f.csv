@@ -1,2 +1,0 @@
-"0","# Ignore this bit of code.  This makes it so that you can render the qmd file even when there are errors in your code."
-"0","knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = TRUE)"

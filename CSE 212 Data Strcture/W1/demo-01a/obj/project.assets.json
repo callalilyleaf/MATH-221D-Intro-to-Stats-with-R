@@ -8,19 +8,24 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\calla\\.nuget\\packages\\": {}
+    "C:\\Users\\calla\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01a\\demo-01a.csproj",
+      "projectUniqueName": "C:\\Users\\calla\\桌面\\programming\\Academic\\CSE 212 Data Strcture\\W1\\demo-01a\\demo-01a.csproj",
       "projectName": "demo-01a",
-      "projectPath": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01a\\demo-01a.csproj",
+      "projectPath": "C:\\Users\\calla\\桌面\\programming\\Academic\\CSE 212 Data Strcture\\W1\\demo-01a\\demo-01a.csproj",
       "packagesPath": "C:\\Users\\calla\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\calla\\桌面\\programming\\CSE 212\\W1\\demo-01a\\obj\\",
+      "outputPath": "C:\\Users\\calla\\桌面\\programming\\Academic\\CSE 212 Data Strcture\\W1\\demo-01a\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\calla\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\calla\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

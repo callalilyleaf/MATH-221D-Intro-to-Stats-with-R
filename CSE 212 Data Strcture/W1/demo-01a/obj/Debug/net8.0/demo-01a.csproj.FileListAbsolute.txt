@@ -12,3 +12,11 @@ C:\Users\calla\桌面\programming\CSE 212\W1\demo-01a\obj\Debug\net8.0\refint\de
 C:\Users\calla\桌面\programming\CSE 212\W1\demo-01a\obj\Debug\net8.0\demo-01a.pdb
 C:\Users\calla\桌面\programming\CSE 212\W1\demo-01a\obj\Debug\net8.0\demo-01a.genruntimeconfig.cache
 C:\Users\calla\桌面\programming\CSE 212\W1\demo-01a\obj\Debug\net8.0\ref\demo-01a.dll
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.AssemblyInfoInputs.cache
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.AssemblyInfo.cs
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.csproj.CoreCompileInputs.cache
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.sourcelink.json
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.dll
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\refint\demo-01a.dll
+C:\Users\calla\桌面\programming\Academic\CSE 212 Data Strcture\W1\demo-01a\obj\Debug\net8.0\demo-01a.pdb

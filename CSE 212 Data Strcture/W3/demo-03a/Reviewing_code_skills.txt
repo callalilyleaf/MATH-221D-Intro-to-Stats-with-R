@@ -1,0 +1,8 @@
+﻿The tips of reviewing codes:
+
+1. If the relationships of each function are complicated, use structure chart(or calling tree, function based) to visualize the calling relations between them.
+
+2. If there are multiple classes interact with each others, use UML(Unified Modeling Language) class diagram to visualize the relationships between classes. Use HAS-A relation line and IS-A line to make relationships more readable.
+2.1 Start to understand the classes who are dependant from the others. (Like the parent classes in SQL)
+
+3. Or you can also use flow chart to visualize the loops, decisions, and the execution flow.

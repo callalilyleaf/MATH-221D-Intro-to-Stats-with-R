@@ -1,0 +1,19 @@
+﻿Definition of Stack:
+- A data structure that follows a Last In, First Out(LIFO) rule. THe stack is used to reverse data or remember previous data including previous results.
+
+Benefits and usage of Stack:
+1. The history of operations of Stack will be recorded. -Easy to track the history and perform operations backwards(ex. Undo).
+2. A stack can be represented using an array of various data types.
+3. Common Stack Operations:
+ 
+-Push, adds value to the back of the stack
+myStack.Push(value); 
+
+-Pop, removes and returns the item from the back of the stack 
+var value = myStack.Pop(); 
+
+-Count value, returns the size(Not capacity) of a stack
+var length = myStack.Count; 
+
+-Count comparison
+myStack.Count == 0;
